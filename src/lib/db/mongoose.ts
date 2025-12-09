@@ -1,4 +1,3 @@
-
 // src/lib/db/mongoose.ts
 import mongoose from "mongoose";
 const URI = process.env.MONGODB_URI || "";
@@ -27,3 +26,6 @@ export default async function connectDB(): Promise<typeof mongoose> {
   }
   return await global.__mongoose_conn__;
 }
+
+// הוספה ↓↓↓
+export { connectDB };

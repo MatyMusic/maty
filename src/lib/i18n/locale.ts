@@ -17,3 +17,13 @@ export function normalizeLocale(input?: string | null): string {
   // ברירת מחדל – עברית
   return "he";
 }
+
+// בודק האם ה-locale של פריט מתאים ל-locale המבוקש
+export function localeMatches(
+  itemLocale: string | string[] | undefined,
+  wanted: string | undefined,
+): boolean {
+  if (!wanted || !itemLocale) return true;
+  if (Array.isArray(itemLocale)) return itemLocale.includes(wanted);
+  return itemLocale === wanted;
+}

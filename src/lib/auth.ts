@@ -243,3 +243,20 @@ export async function getAuth() {
 export async function auth() {
   return getServerSession(authOptions);
 }
+
+// ==== תוספת תאימות ישנה – לא להפיל קוד קיים ====
+
+// עטיפה נוחה ל־NextAuth – מחזירה גם session וגם user
+export async function getServerAuth() {
+  const session = await getServerSession(authOptions);
+  return {
+    session,
+    user: session?.user ?? null,
+  };
+}
+
+// פונקציה פשוטה שמחזירה רק את ה־user (או null)
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
+  return session?.user ?? null;
+}

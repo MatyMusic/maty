@@ -1,7 +1,7 @@
 // src/lib/clubStore.ts
+import crypto from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
-import crypto from "crypto";
 
 /** =========================
  *  Types
@@ -135,4 +135,14 @@ export async function saveUpload(
   await fs.writeFile(path.join(dir, fname), buf);
   // public URL
   return `/uploads/club/${kind}/${fname}`;
+}
+
+// ספירה בסיסית עבור /api/admin/metrics – אפשר לשפר בעתיד
+export async function getCounts() {
+  return {
+    users: 0,
+    posts: 0,
+    groups: 0,
+    jamSessions: 0,
+  };
 }

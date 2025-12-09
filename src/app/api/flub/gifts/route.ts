@@ -1,29 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/db/mongoose";
-import Gift from "@/models/club/Gift"; // ⬅️ דיפולט
-import { z } from "zod";
+// src/app/api/flub/gifts/route.ts
+import { NextResponse } from "next/server";
 
-const schema = z.object({
-  toUserId: z.string(),
-  kind: z.string(),
-  amount: z.number().optional(),
-  message: z.string().optional(),
-  postId: z.string().optional(),
-});
+export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  await connectDB();
-  const body = await req.json().catch(() => ({}));
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, error: parsed.error.flatten() },
-      { status: 400 },
-    );
-  }
-  const doc = await Gift.create({
-    fromUserId: "temp-user", // TODO: session.user.id
-    ...parsed.data,
+// GET – מחזיר רשימת מתנות (בשלב ראשון ריק)
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    gifts: [],
   });
-  return NextResponse.json({ ok: true, gift: doc });
+}
+
+// POST – יצירת/שליחת מתנה (placeholder)
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => ({}));
+  console.log("[FLUB/GIFTS] POST body:", body);
+
+  return NextResponse.json(
+    {
+      ok: true,
+      received: body,
+    },
+    { status: 200 },
+  );
 }

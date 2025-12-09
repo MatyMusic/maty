@@ -1,35 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/db/mongoose";
-import Payment from "@/models/club/Payment"; // ⬅️ דיפולט
-import { z } from "zod";
+// src/app/api/flub/payments/route.ts
+import { NextResponse } from "next/server";
 
-const schema = z.object({
-  provider: z.enum(["paybox", "payplus", "paypal"]),
-  amount: z.number().positive(),
-  currency: z.string().default("ILS"),
-  meta: z.record(z.any()).optional(),
-});
+export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  await connectDB();
-  const body = await req.json().catch(() => ({}));
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { ok: false, error: parsed.error.flatten() },
-      { status: 400 },
-    );
-  }
-  const { provider, amount, currency, meta } = parsed.data;
-
-  const payment = await Payment.create({
-    userId: "temp-user", // TODO: session.user.id
-    provider,
-    amount,
-    currency,
-    status: "created",
-    meta,
+// GET – החזרת רשימת תשלומים (בשלב ראשון: ריק)
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    payments: [],
   });
+}
 
-  return NextResponse.json({ ok: true, payment });
+// POST – התחלת תשלום / טרנזקציה (placeholder)
+export async function POST(req: Request) {
+  const body = await req.json().catch(() => ({}));
+  console.log("[FLUB/PAYMENTS] POST body:", body);
+
+  return NextResponse.json(
+    {
+      ok: true,
+      received: body,
+    },
+    { status: 200 },
+  );
 }

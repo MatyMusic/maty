@@ -1,6 +1,6 @@
 // src/lib/db/groups-repo.ts
-import { type Collection, type IndexDescription, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
+import { type Collection, type IndexDescription, ObjectId } from "mongodb";
 
 export type GroupVisibility = "public" | "private";
 export type GroupStatus = "pending" | "approved" | "rejected" | "suspended";
@@ -260,4 +260,14 @@ export async function listPosts(groupId: string, limit = 50) {
     .sort({ createdAt: -1, _id: -1 })
     .limit(Math.min(limit, 200))
     .toArray();
+}
+
+export async function joinGroup(groupId: string, userId: string) {
+  console.log("[groups] joinGroup fallback", { groupId, userId });
+  return { ok: true };
+}
+
+export async function leaveGroup(groupId: string, userId: string) {
+  console.log("[groups] leaveGroup fallback", { groupId, userId });
+  return { ok: true };
 }

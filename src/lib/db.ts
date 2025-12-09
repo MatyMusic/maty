@@ -161,11 +161,14 @@ export type UserBadgeDoc = {
   earnedAt: Date;
 };
 
-// דוגמה לשימוש Mongo (אופציונלי):
-// const membershipCol = await getCollection<MembershipDoc>("memberships");
+// ➜ תאימות לקוד ישן – getMainDb + DEFAULT_DB
+export const DEFAULT_DB = MAIN_DB;
+
+export async function getMainDb(): Promise<Db> {
+  return getDb(MAIN_DB);
+}
 
 // ➜ פונקציה מפורשת לחיבור (אפשר לקרוא בתחילת Routeים כבדים)
-
 export async function connectDB(): Promise<void> {
   if (process.env.NODE_ENV === "development") {
     console.log(

@@ -69,5 +69,8 @@ export function buildWaDeepLink(toRaw: string, text: string) {
   return `https://wa.me/${e164}?text=${encodeURIComponent(text)}`;
 }
 
-
-
+// שליחת SMS לדיבאג / סביבת DEV – רק לוג בקונסול
+export async function sendSms(to: string, body: string) {
+  console.log("[sms:test] to=%s body=%s", to, body);
+  return { ok: true };
+}

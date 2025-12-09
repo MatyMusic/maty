@@ -459,3 +459,13 @@ export function toExerciseItem(x: WgerNormalized) {
     videoUrl: undefined,
   };
 }
+
+export async function wgerList() {
+  // TODO: למשוך מה-API האמיתי של wger בעתיד
+  return [];
+}
+
+export async function wgerGet(id: string | number) {
+  // TODO: החזרה אמיתית של תרגיל / אימון
+  return null;
+}
