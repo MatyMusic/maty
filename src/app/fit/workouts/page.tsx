@@ -1,38 +1,38 @@
 // src/app/fit/workouts/page.tsx
 "use client";
 
-import * as React from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/maty/ui/accordion";
+import { Badge } from "@/maty/ui/badge";
+import { Button } from "@/maty/ui/button"; // ✅ fix import path
+import { Card, CardContent, CardHeader, CardTitle } from "@/maty/ui/card";
+import { Input } from "@/maty/ui/input";
+import { Separator } from "@/maty/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/maty/ui/tabs";
+import { Textarea } from "@/maty/ui/textarea";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  BookOpenText,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Clock3,
   Dumbbell,
+  GripVertical,
+  History,
+  Layers3,
   Plus,
   Save,
   Search,
   Trash2,
-  ChevronDown,
-  ChevronUp,
-  Clock3,
-  Check,
-  History,
-  GripVertical,
-  Layers3,
-  BookOpenText,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/maty/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/maty/ui/tabs";
-import { Button } from "@/maty/ui/button"; // ✅ fix import path
-import { Input } from "@/maty/ui/input";
-import { Textarea } from "@/maty/ui/textarea";
-import { Badge } from "@/maty/ui/badge";
-import { Separator } from "@/maty/ui/separator";
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from "@/maty/ui/accordion";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 /* -------------------------------------------------------------------------- */
 /*                               Types & Models                               */

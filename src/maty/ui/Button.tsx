@@ -1,47 +1,57 @@
-// src/maty/ui/Button.tsx
+// src/maty/ui/button.tsx
 "use client";
 
+import clsx from "clsx";
 import * as React from "react";
 
+export type MatyButtonVariant = "primary" | "secondary" | "outline" | "ghost";
+
+export type MatyButtonSize = "sm" | "md" | "lg" | "icon";
+
 export type MatyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "outline";
-  size?: "sm" | "md" | "lg";
+  variant?: MatyButtonVariant;
+  size?: MatyButtonSize;
+  fullWidth?: boolean;
 };
 
-function classNames(...parts: Array<string | false | null | undefined>) {
-  return parts.filter(Boolean).join(" ");
-}
+/**
+ * כפתור בסיסי ל-MATY:
+ * - עובד גם כ-default export וגם כ-named export (Button)
+ * - תומך ב-variant / size / disabled
+ */
+export function Button(props: MatyButtonProps) {
+  const {
+    className,
+    variant = "primary",
+    size = "md",
+    fullWidth,
+    disabled,
+    ...rest
+  } = props;
 
-export function Button({
-  variant = "primary",
-  size = "md",
-  className,
-  children,
-  ...rest
-}: MatyButtonProps) {
-  const base =
-    "inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50 disabled:pointer-events-none";
-
-  const v =
-    variant === "primary"
-      ? "bg-brand text-white hover:opacity-90"
-      : variant === "outline"
-        ? "border border-black/10 dark:border-white/20 bg-transparent hover:bg-black/5 dark:hover:bg-white/10"
-        : "bg-transparent hover:bg-black/5 dark:hover:bg-white/10";
-
-  const s =
-    size === "sm"
-      ? "h-8 px-3 text-xs"
-      : size === "lg"
-        ? "h-11 px-6 text-sm"
-        : "h-10 px-4 text-sm";
-
-  return (
-    <button className={classNames(base, v, s, className)} {...rest}>
-      {children}
-    </button>
+  const classes = clsx(
+    "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-150",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500",
+    disabled && "opacity-60 cursor-not-allowed",
+    !disabled && "hover:scale-[1.02] active:scale-[0.98]",
+    // וריאנטים
+    variant === "primary" &&
+      "bg-indigo-600 text-white shadow-md hover:bg-indigo-700",
+    variant === "secondary" && "bg-slate-800 text-slate-100 hover:bg-slate-900",
+    variant === "outline" &&
+      "border border-slate-500 text-slate-100 bg-transparent hover:bg-slate-800",
+    variant === "ghost" && "bg-transparent text-slate-100 hover:bg-slate-800",
+    // גדלים
+    size === "sm" && "text-sm px-3 py-1.5",
+    size === "md" && "text-sm px-4 py-2",
+    size === "lg" && "text-base px-5 py-2.5",
+    size === "icon" && "h-10 w-10 p-0",
+    fullWidth && "w-full",
+    className,
   );
+
+  return <button className={classes} disabled={disabled} {...rest} />;
 }
 
-// 👈 זה מה שהיה חסר לך
+// תאימות ל-import default:  import Button from "@/maty/ui/button"
 export default Button;
