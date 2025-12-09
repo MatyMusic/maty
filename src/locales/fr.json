@@ -1,0 +1,102 @@
+{
+  "common": {
+    "appName": "MATY MUSIC",
+    "skipToContent": "Aller au contenu",
+    "liveMusicExperience": "Expérience de musique live",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair"
+  },
+  "buttons": {
+    "bookNow": "Réserver maintenant",
+    "login": "Se connecter",
+    "register": "S’inscrire",
+    "googleSignIn": "Continuer avec Google",
+    "close": "Fermer",
+    "notNow": "Pas maintenant",
+    "checkMatches": "Voir les correspondances",
+    "profileTab": "Mon onglet profil 🚀",
+    "signOut": "Se déconnecter"
+  },
+  "header": {
+    "navHome": "Accueil",
+    "navNigunim": "Nigunim",
+    "navClub": "MATY-CLUB",
+    "navDate": "MATY-DATE",
+    "navContact": "Contact",
+    "pages": "Pages",
+    "pagesGallery": "Galerie",
+    "pagesPricing": "Tarifs",
+    "pagesEvents": "Événements",
+    "pagesAbout": "À propos",
+    "pagesShorts": "Shorts",
+    "pagesDateFaq": "MATY-DATE FAQ",
+    "admin": "Admin",
+    "adminActive": "⭐ Admin actif",
+    "displayMode": "Mode d’affichage",
+    "modeLight": "☀️ Clair",
+    "modeDark": "🌙 Sombre"
+  },
+  "dateNudge": {
+    "title": "Un lien par la musique ? 🙂",
+    "subtitle": "Essayez MATY-DATE — des rencontres propres pour les communautés juives."
+  },
+  "user": {
+    "myAccount": "Mon compte",
+    "dashboard": "Tableau de bord"
+  },
+  "tabs": {
+    "overview": "Aperçu",
+    "music": "Music DNA",
+    "bookings": "Réservations",
+    "date": "MATY-DATE",
+    "admin": "Admin"
+  },
+  "overview": {
+    "last30": "30 derniers jours",
+    "plays": "Écoutes",
+    "likes": "J’aime",
+    "avgSessionMin": "Minutes / session",
+    "footnote": "* Données reflétant l’activité sur le site."
+  },
+  "genres": {
+    "chabad": "Habad",
+    "mizrahi": "Mizrahi",
+    "soft": "Doux",
+    "fun": "Festif",
+    "ranking": "Classement des genres"
+  },
+  "bookings": {
+    "recent": "Réservations récentes",
+    "id": "#",
+    "event": "Événement",
+    "date": "Date",
+    "status": "Statut",
+    "cta": "Réserver un événement",
+    "statusConfirmed": "Confirmé",
+    "statusHold": "En attente"
+  },
+  "datePanel": {
+    "statusTitle": "Statut MATY-DATE",
+    "optinLabel": "Opt-in :",
+    "optedInYes": "Oui",
+    "optedInNo": "Non",
+    "note": "Les nudges s’affichent seulement après opt-in, avec un cool-down local.",
+    "matchesDemo": "Correspondances récentes (démo)",
+    "transparency": "Transparence",
+    "transparencyNote": "Vous pouvez activer/désactiver l’intérêt pour MATY-DATE à tout moment."
+  },
+  "adminPanel": {
+    "linksTitle": "Liens Admin",
+    "dashboard": "Tableau Admin",
+    "bookings": "Réservations",
+    "stats": "Stats",
+    "localMode": "Admin (local)",
+    "localNote": "Aussi activé via NEXT_PUBLIC_ADMIN_EMAILS."
+  },
+  "contactDock": {
+    "whatsapp": "WhatsApp",
+    "email": "E-mail",
+    "call": "Appeler",
+    "downloadCard": "Télécharger la carte de visite"
+  }
+}

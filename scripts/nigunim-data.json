@@ -1,0 +1,12 @@
+[
+  { "title": "ניע זשוריצי חליאווה", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","התוועדות","דביקות"], "mood":"דביקות" },
+  { "title": "צמאה לך נפשי", "category": "chabad", "subcategory": "dveikus", "tags": ["חב\"ד","נשמה"], "tempo":"slow" },
+  { "title": "אני מאמין", "category": "jewish", "subcategory": "tefila", "tags":["אמונה","נשמה"], "tempo":"slow" },
+  { "title": "ושמחת בחגך", "category": "jewish", "subcategory": "yomTov", "tags":["שמחה","חגים"], "tempo":"mid" },
+  { "title": "יגדל", "category": "jewish", "subcategory": "zemirot", "tags":["שבת","זמירות"], "tempo":"slow" },
+  { "title": "ובלירושלים עירך", "category": "chabad", "subcategory": "farbrengen", "tags":["חב\"ד"], "tempo":"mid" },
+  { "title": "יפוצו מעיינותיך", "category": "chabad", "subcategory": "rikud", "tags":["ריקוד"], "tempo":"fast" },
+  { "title": "כה אמר", "category": "hassidic", "subcategory": "tish", "tags":["טיש"], "tempo":"mid" },
+  { "title": "מארש חתן", "category": "hassidic", "subcategory": "weddingDance", "tags":["חתונה","ריקוד"], "tempo":"fast" },
+  { "title": "אבינו מלכנו", "category": "jewish", "subcategory": "tefila", "tags":["ימים נוראים"], "tempo":"slow" }
+]

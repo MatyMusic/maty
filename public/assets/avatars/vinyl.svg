@@ -1,0 +1,18 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vinyl">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#f3f4f6"></stop>
+      <stop offset="100%" stop-color="#d1d5db"></stop>
+    </radialGradient>
+  </defs>
+  <!-- Disc -->
+  <circle cx="64" cy="64" r="56" fill="url(#g)" stroke="#111827" stroke-width="2"></circle>
+  <!-- Grooves -->
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#111827" stroke-opacity=".15" stroke-width="2"></circle>
+  <circle cx="64" cy="64" r="32" fill="none" stroke="#111827" stroke-opacity=".15" stroke-width="2"></circle>
+  <circle cx="64" cy="64" r="20" fill="none" stroke="#111827" stroke-opacity=".15" stroke-width="2"></circle>
+  <!-- Label -->
+  <circle cx="64" cy="64" r="14" fill="#9ca3af" stroke="#111827" stroke-width="2"></circle>
+  <!-- Spindle hole -->
+  <circle cx="64" cy="64" r="3" fill="#111827"></circle>
+</svg>

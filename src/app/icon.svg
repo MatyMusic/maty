@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <radialGradient id="rg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#F0ABFC"></stop>
+      <stop offset="50%" stop-color="#8B5CF6"></stop>
+      <stop offset="100%" stop-color="#38BDF8"></stop>
+    </radialGradient>
+  </defs>
+  <circle cx="120" cy="120" r="112" fill="url(#rg)"></circle>
+  <g fill="#fff" font-family="system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial" font-weight="900">
+    <text x="50%" y="54%" font-size="96" text-anchor="middle" dominant-baseline="middle">MG</text>
+  </g>
+</svg>

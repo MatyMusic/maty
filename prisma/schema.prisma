@@ -1,0 +1,135 @@
+model User {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  email String  @unique
+  name  String?
+  image String?
+  role  String  @default("user")
+
+  profile  Profile?
+  posts    Post[]
+  comments Comment[]
+  likes    Like[]
+  reviews  Review[]
+  gifts    Gift[]    @relation("GiftSender")
+  shorts   Short[]
+  messages Message[] @relation("AuthorMessages")
+
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  ConversationMember ConversationMember[]
+}
+
+model Profile {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  @unique @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+  bio       String?
+  avatarUrl String?
+  genre     String? // chabad|mizrahi|soft|fun
+  city      String?
+  links     Json?
+}
+
+model Post {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  authorId  String    @db.ObjectId
+  author    User      @relation(fields: [authorId], references: [id])
+  text      String?
+  images    String[]  @default([])
+  videoUrl  String?
+  likeCount Int       @default(0)
+  comments  Comment[]
+  likes     Like[]
+
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  postId   String @db.ObjectId
+  post     Post   @relation(fields: [postId], references: [id])
+  authorId String @db.ObjectId
+  author   User   @relation(fields: [authorId], references: [id])
+  text     String
+
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id])
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+}
+
+model Review {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  authorId String  @db.ObjectId
+  author   User    @relation(fields: [authorId], references: [id])
+  eventId  String? @db.ObjectId
+  rating   Int // 1..5
+  text     String?
+
+  photos    String[] @default([])
+  createdAt DateTime @default(now())
+}
+
+model Gift {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String  @db.ObjectId
+  sender     User    @relation("GiftSender", fields: [senderId], references: [id])
+  receiverId String  @db.ObjectId
+  amount     Int // אגורות/שקלים לפי החלטה
+  kind       String // "arak_shot" | "gold_mic" | "vip_ticket" ...
+  note       String?
+
+  createdAt DateTime @default(now())
+}
+
+model Short {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id])
+  videoUrl  String
+  thumbnail String?
+  caption   String?
+  tags      String[] @default([])
+
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Conversation {
+  id        String               @id @default(auto()) @map("_id") @db.ObjectId
+  isGroup   Boolean              @default(false)
+  members   ConversationMember[]
+  messages  Message[]
+  updatedAt DateTime             @updatedAt
+  createdAt DateTime             @default(now())
+}
+
+model ConversationMember {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         String       @db.ObjectId
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String       @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  authorId       String       @db.ObjectId
+  author         User         @relation("AuthorMessages", fields: [authorId], references: [id])
+  text           String?
+  audioUrl       String?
+  videoUrl       String?
+
+  createdAt DateTime @default(now())
+}

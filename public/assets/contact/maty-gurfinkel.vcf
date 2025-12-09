@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:4.0
+N:Gurfinkel;Maty;;;
+FN:Maty Gurfinkel (MG)
+ORG:MATY MUSIC
+TITLE:Keyboard & Vocals — PA5X
+TEL;TYPE=cell,voice;VALUE=uri:tel:+972547700019
+EMAIL;TYPE=work;PREF=1:matymusic770@gmail.com
+URL:https://maty.example
+IMPP;X-SERVICE-TYPE=WhatsApp:waid:+972547700019
+NOTE:Booking live shows. Genres: Chabad, Mizrahi, Soft, Fun.
+REV:2025-08-20T00:00:00Z
+END:VCARD
+

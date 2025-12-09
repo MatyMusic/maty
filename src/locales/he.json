@@ -1,0 +1,102 @@
+{
+  "common": {
+    "appName": "MATY MUSIC",
+    "skipToContent": "דלג לתוכן",
+    "liveMusicExperience": "חוויית מוזיקה חיה",
+    "darkMode": "מצב כהה",
+    "lightMode": "מצב בהיר"
+  },
+  "buttons": {
+    "bookNow": "הזמן הופעה",
+    "login": "כניסה",
+    "register": "הרשמה",
+    "googleSignIn": "התחברות עם Google",
+    "close": "סגור",
+    "notNow": "לא עכשיו",
+    "checkMatches": "לבדוק התאמות",
+    "profileTab": "לשונית הפרופיל שלי 🚀",
+    "signOut": "התנתק"
+  },
+  "header": {
+    "navHome": "בית",
+    "navNigunim": "ניגונים",
+    "navClub": "MATY-CLUB",
+    "navDate": "MATY-DATE",
+    "navContact": "צור קשר",
+    "pages": "דפים",
+    "pagesGallery": "גלריה",
+    "pagesPricing": "מחירון",
+    "pagesEvents": "אירועים",
+    "pagesAbout": "אודות",
+    "pagesShorts": "Shorts",
+    "pagesDateFaq": "MATY-DATE FAQ",
+    "admin": "Admin",
+    "adminActive": "⭐ אדמין פעיל",
+    "displayMode": "מצב תצוגה",
+    "modeLight": "☀️ בהיר",
+    "modeDark": "🌙 כהה"
+  },
+  "dateNudge": {
+    "title": "מצאת חיבור דרך המוזיקה? 🙂",
+    "subtitle": "אפשר לנסות MATY-DATE – התאמות נקיות לקהילות יהודיות."
+  },
+  "user": {
+    "myAccount": "החשבון שלי",
+    "dashboard": "לוח בקרה"
+  },
+  "tabs": {
+    "overview": "סקירה",
+    "music": "Music DNA",
+    "bookings": "הזמנות",
+    "date": "MATY-DATE",
+    "admin": "Admin"
+  },
+  "overview": {
+    "last30": "ביצועים אחרונים (30 ימים)",
+    "plays": "האזנות",
+    "likes": "לייקים",
+    "avgSessionMin": "דקות לסשן",
+    "footnote": "* נתונים מייצגים פעילות באתר."
+  },
+  "genres": {
+    "chabad": "חב״ד",
+    "mizrahi": "מזרחי",
+    "soft": "שקט",
+    "fun": "מקפיץ",
+    "ranking": "דירוג ז׳אנרים"
+  },
+  "bookings": {
+    "recent": "הזמנות אחרונות",
+    "id": "#",
+    "event": "אירוע",
+    "date": "תאריך",
+    "status": "סטטוס",
+    "cta": "להזמין אירוע",
+    "statusConfirmed": "אישור",
+    "statusHold": "הולד"
+  },
+  "datePanel": {
+    "statusTitle": "מצב MATY-DATE",
+    "optinLabel": "Opt-in:",
+    "optedInYes": "כן",
+    "optedInNo": "לא",
+    "note": "נאג׳ים יוצגו רק לאחר Opt-in עם cool-down.",
+    "matchesDemo": "התאמות אחרונות (דמו)",
+    "transparency": "שקיפות",
+    "transparencyNote": "אפשר לכבות/להדליק עניין ב-MATY-DATE בכל רגע."
+  },
+  "adminPanel": {
+    "linksTitle": "קישורי ניהול",
+    "dashboard": "לוח ניהול",
+    "bookings": "הזמנות",
+    "stats": "סטטיסטיקות",
+    "localMode": "מצב אדמין (לוקלי)",
+    "localNote": "מופעל גם לפי NEXT_PUBLIC_ADMIN_EMAILS."
+  },
+  "contactDock": {
+    "whatsapp": "וואטסאפ",
+    "email": "מייל",
+    "call": "התקשר",
+    "downloadCard": "הורד כרטיס ביקור"
+  }
+}

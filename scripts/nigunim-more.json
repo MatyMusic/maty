@@ -1,0 +1,29 @@
+[
+  { "title": "צמאה לך נפשי", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","התוועדות","נשמה"], "tempo": "slow", "mood": "דביקות", "composer": "מסורתי" },
+  { "title": "ניע זשוריצי חליאווה", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","דביקות"], "tempo": "slow", "mood": "דביקות" },
+  { "title": "ד' בבות (ד' בבות)", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","עמוק"], "tempo": "slow", "mood": "דביקות" },
+  { "title": "ניעט ניעט ניקאווא", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","נשמה"], "tempo": "mid", "mood": "דביקות" },
+  { "title": "יפוצו מעיינותיך", "category": "chabad", "subcategory": "rikud", "tags": ["ריקוד","חב\"ד"], "tempo": "fast", "mood": "שמחה" },
+  { "title": "כי בשמחה תצאון", "category": "chabad", "subcategory": "rikud", "tags": ["ריקוד","שמחה","חב\"ד"], "tempo": "fast", "mood": "שמחה" },
+  { "title": "פדה בשלום", "category": "chabad", "subcategory": "farbrengen", "tags": ["חב\"ד","התוועדות"], "tempo": "mid", "mood": "נשמה" },
+  { "title": "אבינו מלכנו (לחן חב\"ד)", "category": "chabad", "subcategory": "tefila", "tags": ["ימים נוראים","תפילה","חב\"ד"], "tempo": "slow", "mood": "דביקות" },
+
+  { "title": "ידיד נפש", "category": "jewish", "subcategory": "zemirot", "tags": ["שבת","נשמה"], "tempo": "slow", "mood": "דביקות", "composer": "מסורתי" },
+  { "title": "דרור יקרא", "category": "jewish", "subcategory": "zemirot", "tags": ["שבת","זמירות"], "tempo": "mid", "mood": "שמחה" },
+  { "title": "יגדל", "category": "jewish", "subcategory": "zemirot", "tags": ["שבת","זמירות"], "tempo": "slow", "mood": "נשמה" },
+  { "title": "שלום עליכם", "category": "jewish", "subcategory": "zemirot", "tags": ["שבת","קבלת שבת"], "tempo": "slow", "mood": "רגוע" },
+  { "title": "לכה דודי (נוסח עממי)", "category": "jewish", "subcategory": "zemirot", "tags": ["שבת","קבלת שבת"], "tempo": "mid", "mood": "מרומם" },
+  { "title": "ושמחת בחגך", "category": "jewish", "subcategory": "yomTov", "tags": ["חגים","שמחה"], "tempo": "mid", "mood": "שמחה" },
+  { "title": "עננו אלוקי אברהם", "category": "jewish", "subcategory": "tefila", "tags": ["סליחות","תפילה"], "tempo": "slow", "mood": "נשמה" },
+
+  { "title": "טאנץ ניגון", "category": "hassidic", "subcategory": "weddingDance", "tags": ["חתונה","ריקוד"], "tempo": "fast", "mood": "שמחה" },
+  { "title": "כה אמר", "category": "hassidic", "subcategory": "tish", "tags": ["טיש","נשמה"], "tempo": "mid", "mood": "דביקות" },
+  { "title": "אשת חיל (נוסח חסידי)", "category": "hassidic", "subcategory": "zemirot", "tags": ["שבת","זמירות"], "tempo": "mid", "mood": "מרומם" },
+  { "title": "מזמור לדוד (השם רועי)", "category": "hassidic", "subcategory": "tish", "tags": ["טיש","ניגון חסידי"], "tempo": "slow", "mood": "דביקות" },
+
+  { "title": "הבה נגילה", "category": "dance", "subcategory": "horah", "tags": ["ריקוד","שמח"], "tempo": "fast", "mood": "שמחה", "composer": "מסורתי" },
+  { "title": "עוד ישמע", "category": "dance", "subcategory": "weddingDance", "tags": ["חתונה","ריקוד"], "tempo": "fast", "mood": "שמחה" },
+  { "title": "סימן טוב ומזל טוב", "category": "dance", "subcategory": "weddingDance", "tags": ["חתונה","שבע ברכות"], "tempo": "fast", "mood": "שמחה" },
+  { "title": "אם אשכחך ירושלים", "category": "dance", "subcategory": "wedding", "tags": ["חתונה","ירושלים"], "tempo": "slow", "mood": "מרגש" },
+  { "title": "ירושלים של זהב (ניגון ריקוד)", "category": "dance", "subcategory": "horah", "tags": ["ירושלים","ריקוד"], "tempo": "mid", "mood": "מרומם" }
+]

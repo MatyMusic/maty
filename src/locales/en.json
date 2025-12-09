@@ -1,0 +1,102 @@
+{
+  "common": {
+    "appName": "MATY MUSIC",
+    "skipToContent": "Skip to content",
+    "liveMusicExperience": "Live music experience",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode"
+  },
+  "buttons": {
+    "bookNow": "Book now",
+    "login": "Log in",
+    "register": "Sign up",
+    "googleSignIn": "Continue with Google",
+    "close": "Close",
+    "notNow": "Not now",
+    "checkMatches": "Check matches",
+    "profileTab": "My profile tab 🚀",
+    "signOut": "Sign out"
+  },
+  "header": {
+    "navHome": "Home",
+    "navNigunim": "Nigunim",
+    "navClub": "MATY-CLUB",
+    "navDate": "MATY-DATE",
+    "navContact": "Contact",
+    "pages": "Pages",
+    "pagesGallery": "Gallery",
+    "pagesPricing": "Pricing",
+    "pagesEvents": "Events",
+    "pagesAbout": "About",
+    "pagesShorts": "Shorts",
+    "pagesDateFaq": "MATY-DATE FAQ",
+    "admin": "Admin",
+    "adminActive": "⭐ Admin active",
+    "displayMode": "Display mode",
+    "modeLight": "☀️ Light",
+    "modeDark": "🌙 Dark"
+  },
+  "dateNudge": {
+    "title": "Found a connection through music? 🙂",
+    "subtitle": "Try MATY-DATE — clean matches for Jewish communities."
+  },
+  "user": {
+    "myAccount": "My account",
+    "dashboard": "Dashboard"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "music": "Music DNA",
+    "bookings": "Bookings",
+    "date": "MATY-DATE",
+    "admin": "Admin"
+  },
+  "overview": {
+    "last30": "Last 30 days",
+    "plays": "Plays",
+    "likes": "Likes",
+    "avgSessionMin": "Minutes per session",
+    "footnote": "* Data reflects on-site activity."
+  },
+  "genres": {
+    "chabad": "Chabad",
+    "mizrahi": "Mizrahi",
+    "soft": "Soft",
+    "fun": "Upbeat",
+    "ranking": "Genre ranking"
+  },
+  "bookings": {
+    "recent": "Recent bookings",
+    "id": "#",
+    "event": "Event",
+    "date": "Date",
+    "status": "Status",
+    "cta": "Book an event",
+    "statusConfirmed": "Confirmed",
+    "statusHold": "Hold"
+  },
+  "datePanel": {
+    "statusTitle": "MATY-DATE status",
+    "optinLabel": "Opt-in:",
+    "optedInYes": "Yes",
+    "optedInNo": "No",
+    "note": "Nudges are shown only after opt-in with a local cool-down.",
+    "matchesDemo": "Recent matches (demo)",
+    "transparency": "Transparency",
+    "transparencyNote": "You can toggle MATY-DATE interest anytime."
+  },
+  "adminPanel": {
+    "linksTitle": "Admin links",
+    "dashboard": "Admin dashboard",
+    "bookings": "Bookings",
+    "stats": "Stats",
+    "localMode": "Admin (local)",
+    "localNote": "Also enabled via NEXT_PUBLIC_ADMIN_EMAILS."
+  },
+  "contactDock": {
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "call": "Call",
+    "downloadCard": "Download contact card"
+  }
+}

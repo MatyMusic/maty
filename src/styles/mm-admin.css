@@ -1,0 +1,167 @@
+/* src/styles/mm-admin.css
+   סט UX קומפקטי לפאנל ניהול + כמה utilities כלליים  */
+
+.mm-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(0,0,0,.1);
+  background: color-mix(in oklab, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: var(--shadow-card);
+}
+.dark .mm-card {
+  border-color: rgba(255,255,255,.12);
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  box-shadow: var(--shadow-card-dark);
+}
+
+.mm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  height: 2.5rem;
+  padding-inline: .75rem;
+  font-size: .875rem;
+  font-weight: 600;
+  border-radius: .75rem;
+  border: 1px solid rgba(0,0,0,.1);
+  background: color-mix(in oklab, var(--bg) 92%, transparent);
+  transition: background .15s ease, transform .06s ease;
+}
+.dark .mm-btn { border-color: rgba(255,255,255,.12); background: color-mix(in oklab, var(--bg) 88%, transparent); }
+.mm-btn:hover { background: color-mix(in oklab, var(--bg) 98%, transparent); }
+.dark .mm-btn:hover { background: color-mix(in oklab, var(--bg) 92%, transparent); }
+.mm-pressable:active { transform: scale(.985); }
+
+.mm-btn-primary {
+  color: #fff;
+  background: var(--brand);
+  border-color: transparent;
+}
+.mm-btn-primary:hover { opacity: .92; }
+
+.mm-input, .mm-select, .mm-textarea {
+  width: 100%;
+  min-height: 2.5rem;
+  border-radius: .75rem;
+  padding-inline: .75rem;
+  border: 1px solid rgba(0,0,0,.1);
+  background: color-mix(in oklab, var(--bg) 97%, transparent);
+  color: var(--fg);
+  font-size: .875rem;
+}
+.dark .mm-input, .dark .mm-select, .dark .mm-textarea {
+  border-color: rgba(255,255,255,.12);
+  background: color-mix(in oklab, var(--bg) 94%, transparent);
+}
+.mm-input:focus, .mm-select:focus, .mm-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand) 35%, transparent);
+  border-color: transparent;
+}
+
+.input-rtl { direction: rtl; text-align: right; }
+.input-ltr { direction: ltr; text-align: left; }
+
+.card { border-radius: 1rem; border: 1px solid rgba(0,0,0,.1); background: color-mix(in oklab, var(--bg) 88%, transparent); box-shadow: var(--shadow-card); }
+.dark .card { border-color: rgba(255,255,255,.12); background: color-mix(in oklab, var(--bg) 78%, transparent); box-shadow: var(--shadow-card-dark); }
+
+/* ריינג׳ יפה לבר נגינה/ווליום */
+.mm-range, input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 28px;
+  background: transparent;
+  width: 100%;
+}
+.mm-range:focus, input[type="range"]:focus { outline: none; }
+.mm-range::-webkit-slider-runnable-track, input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--brand) 75%, transparent), rgba(0,0,0,.12));
+}
+.dark .mm-range::-webkit-slider-runnable-track, .dark input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--brand) 75%, transparent), rgba(255,255,255,.15));
+}
+.mm-range::-webkit-slider-thumb, input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -6px;
+  height: 16px; width: 16px; border-radius: 50%;
+  background: var(--brand);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.dark .mm-range::-webkit-slider-thumb, .dark input[type="range"]::-webkit-slider-thumb { border-color: #0a0a0a; }
+
+/* באדג׳/פיל */
+.mm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  height: 1.75rem;
+  padding-inline: .5rem;
+  font-size: .75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.1);
+}
+.dark .mm-badge { border-color: rgba(255,255,255,.12); }
+.mm-badge-ghost { background: transparent; }
+.mm-badge-brand {
+  background: color-mix(in oklab, var(--brand) 15%, transparent);
+  color: var(--brand);
+  border-color: transparent;
+}
+
+/* גלואו עדין ל-CTA */
+@keyframes pulseGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(236,72,153,.55); }
+  70%  { box-shadow: 0 0 0 16px rgba(236,72,153,0); }
+  100% { box-shadow: 0 0 0 0 rgba(236,72,153,0); }
+}
+.btn-glow { animation: pulseGlow 1.8s ease-out infinite; }
+
+/* wiggle קצר בהובר */
+@keyframes wiggle {
+  0%,100% { transform: rotate(0deg); }
+  30% { transform: rotate(2deg); }
+  60% { transform: rotate(-2deg); }
+}
+.btn-wiggle:hover { animation: wiggle .35s ease-in-out; }
+
+/* סקליטון */
+.skeleton {
+  background: linear-gradient(90deg, rgba(0,0,0,.06), rgba(0,0,0,.12), rgba(0,0,0,.06));
+  background-size: 200% 100%;
+  animation: mm-skel 1.2s infinite linear;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.16), rgba(255,255,255,.08));
+}
+@keyframes mm-skel {
+  from { background-position-x: 200%; }
+  to   { background-position-x: -200%; }
+}
+
+/* טבעת אווטאר */
+.avatar-ring { position: relative; display: inline-grid; place-items: center; }
+.avatar-ring::before {
+  content: ""; position: absolute; inset: -2px; border-radius: 999px;
+  background: conic-gradient(from 180deg, var(--brand), transparent 60%);
+  filter: blur(6px); opacity: .35; z-index: 0;
+}
+.avatar-ring > * { position: relative; z-index: 1; border-radius: 999px; }
+
+/* דוק תחתון */
+.dock-blur {
+  background: linear-gradient(to top,
+    color-mix(in oklab, var(--bg) 96%, transparent),
+    color-mix(in oklab, var(--bg) 72%, transparent)
+  );
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+.dark .dock-blur { border-top-color: rgba(255,255,255,.12); }
+
+/* פורטל drawer — בידוד לצמצום רינדור מחדש */
+.drawer-portal, .drawer-portal * { contain: layout style paint; }
