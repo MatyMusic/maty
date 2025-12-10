@@ -1,6 +1,6 @@
 // src/lib/i18n/messages.ts
 
-export const SUPPORTED_LOCALES = ["he", "en"] as const;
+export const SUPPORTED_LOCALES = ["he", "en", "fr", "ru"] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "he";
@@ -32,10 +32,33 @@ const enMessages: Messages = {
   },
 };
 
+/* ========= FRENCH (עדכן/השלם תוכן אמיתי) ========= */
+const frMessages: Messages = {
+  site: { brand: "MATY-MUSIC" },
+  home: {
+    ctaSectionTitle:
+      "Tout ce dont votre spectacle a besoin, en un seul endroit",
+    ctaSectionSubtitle:
+      "Chansons, sets, rencontres, événements et nigunim – avec une IA pour vous aider à tout faire.",
+  },
+};
+
+/* ========= RUSSIAN (עדכן/השלם תוכן אמיתי) ========= */
+const ruMessages: Messages = {
+  site: { brand: "MATY-MUSIC" },
+  home: {
+    ctaSectionTitle: "Все, что нужно вашему выступлению, в одном месте",
+    ctaSectionSubtitle:
+      "Песни, сеты, знакомства, события и нигуним – с ИИ, который поможет вам сделать все это.",
+  },
+};
+
 /* ========= טבלה לכל הלוקאלים ========= */
 const ALL_MESSAGES: Record<Locale, Messages> = {
   he: heMessages,
   en: enMessages,
+  fr: frMessages,
+  ru: ruMessages,
 };
 
 /** בדיקה אם לוקאל נתמך */

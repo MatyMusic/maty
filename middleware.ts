@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 /* ===================== Locale (no URL prefix) ===================== */
 const SUPPORTED_LOCALES = ["he", "en", "fr", "ru"] as const;
-type Locale = (typeof SUPPORTED_LOCALES)[number];
+export type Locale = (typeof SUPPORTED_LOCALES)[number];
 const DEFAULT_LOCALE: Locale = "he";
 const LOCALE_COOKIE = "mm_locale";
 
@@ -75,7 +75,7 @@ function hasDateOnboarded(req: NextRequest) {
 /* =================================================== */
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl; // מאפשר שינויים/הפניות
-  const { pathname, search } = url;
+  let { pathname, search } = url;
 
   // דלג על סטטיק/API
   const isStatic =
@@ -89,6 +89,7 @@ export async function middleware(req: NextRequest) {
   }
 
   /* =============== LANG: ?lang=xx -> cookie + ניקוי URL =============== */
+  // אם יש פרמטר ?lang=xx ב-URL, קבע את השפה ונתב מחדש כדי להסיר את הפרמטר.
   const langParam = url.searchParams.get("lang");
   if (langParam && SUPPORTED_LOCALES.includes(langParam as Locale)) {
     const clean = new URL(url);
@@ -103,16 +104,43 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  // אם אין קוקי — קבע לפי זיהוי
+  /* =============== 1) ניהול קידומת שפה (Locale Prefix Management) =============== */
   const activeLocale: Locale = detectLocale(req);
   const cNow = (req.cookies.get(LOCALE_COOKIE)?.value || "").toLowerCase();
-  const res = NextResponse.next();
+  let res = NextResponse.next();
+
+  // אם ה-Cookie הנוכחי לא זהה לשפה שזוהתה, עדכן את ה-Cookie.
   if (cNow !== activeLocale) {
     res.cookies.set(LOCALE_COOKIE, activeLocale, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
     });
+    // ה-Rewrite בהמשך ישלח את ה-Cookie המעודכן.
   }
+
+  // בדוק אם הנתיב כבר מכיל קידומת שפה נתמכת.
+  const isLocalePrefixed = SUPPORTED_LOCALES.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
+  );
+
+  // אם הנתיב הנוכחי אינו מכיל קידומת שפה, הוסף אותה ב-Rewrite פנימי.
+  if (!isLocalePrefixed) {
+    const isRoot = pathname === "/";
+    const targetPath = isRoot
+      ? `/${activeLocale}`
+      : `/${activeLocale}${pathname}`;
+
+    // מבצעים Rewrite פנימי: ה-URL בדפדפן נשאר /about, אבל Next.js טוען מ-/[locale]/about
+    const rewrittenUrl = req.nextUrl.clone();
+    rewrittenUrl.pathname = targetPath;
+
+    // משתמשים ב-NextResponse.rewrite על אובייקט ה-res כדי לשמר את ה-Cookie.
+    res = NextResponse.rewrite(rewrittenUrl);
+
+    // עדכון המשתנים המקומיים לטיפול נכון בהפניות הבאות (הנתיב המעובד)
+    pathname = targetPath;
+  }
+  /* =================================================== */
 
   // שמור מסלול מלא ל־next=xxx בהפניות
   const fromFull = pathname + search;
@@ -125,6 +153,8 @@ export async function middleware(req: NextRequest) {
     | "moderator"
     | undefined;
   const isAuthed = !!token || hasSessionCookie(req);
+
+  // הערה: שאר בדיקות הניתוב (2-7) משתמשות כעת ב-`pathname` שכבר עבר Rewrite (כלומר, הוא מכיל קידומת שפה).
 
   /* =============== 2) דף הסכמה תמיד מותר =============== */
   if (

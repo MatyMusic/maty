@@ -2,7 +2,8 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import messagesAll, { DEFAULT_LOCALE, type Locale } from "./messages";
+// ייבוא רק הטיפוסים הנדרשים
+import { DEFAULT_LOCALE, type Locale, type Messages } from "./messages";
 
 export type TFunc = (
   key: string,
@@ -17,16 +18,21 @@ type I18nContextValue = {
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 type I18nProviderProps = {
-  locale?: string;
+  locale: string;
+  messages: Messages; // **שדרוג:** מקבל את מילון ההודעות כבר טעון כ-Prop
   children: ReactNode;
 };
 
-export function I18nProvider({ locale, children }: I18nProviderProps) {
+export function I18nProvider({
+  locale,
+  messages,
+  children,
+}: I18nProviderProps) {
+  // נשתמש ב-DEFAULT_LOCALE רק כ-Fallback לטיפוס
   const lc = ((locale || DEFAULT_LOCALE) as Locale) || DEFAULT_LOCALE;
 
   const value = useMemo<I18nContextValue>(() => {
-    const messages = messagesAll[lc] || messagesAll[DEFAULT_LOCALE];
-
+    // **שדרוג:** משתמשים ישירות באובייקט messages שהתקבל כ-prop.
     const t: TFunc = (key, vars = {}) => {
       // נווט לפי "home.ctaSectionTitle" => home -> ctaSectionTitle
       const parts = key.split(".");
@@ -35,7 +41,7 @@ export function I18nProvider({ locale, children }: I18nProviderProps) {
         if (cur && typeof cur === "object" && p in cur) {
           cur = cur[p];
         } else {
-          cur = key;
+          cur = key; // אם לא נמצא, מחזיר את המפתח עצמו
           break;
         }
       }
@@ -51,11 +57,14 @@ export function I18nProvider({ locale, children }: I18nProviderProps) {
     };
 
     return { locale: lc, t };
-  }, [lc]);
+  }, [lc, messages]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+/**
+ * Hook לאחזור פונקציית התרגום (t)
+ */
 export function useT(): TFunc {
   const ctx = useContext(I18nContext);
   if (!ctx) {
@@ -64,6 +73,9 @@ export function useT(): TFunc {
   return ctx.t;
 }
 
+/**
+ * Hook לאחזור הלוקאל הנוכחי
+ */
 export function useLocale(): Locale {
   const ctx = useContext(I18nContext);
   return ctx?.locale ?? DEFAULT_LOCALE;
