@@ -23,7 +23,7 @@ const UserPresenceSchema = new Schema<UserPresenceDoc>(
   { timestamps: true },
 );
 
-// שים לב לא ליצור שוב את אותו אינדקס פעמיים
+// אינדקס משני – לא קשור ל-lastSeen
 UserPresenceSchema.index(
   { userId: 1, area: 1 },
   { unique: false, name: "user_area_idx" },

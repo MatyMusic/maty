@@ -1,3 +1,4 @@
+// src/models/Presence.ts
 import mongoose, { Schema, Types } from "mongoose";
 
 export type PresenceDoc = {
@@ -15,12 +16,14 @@ const PresenceSchema = new Schema<PresenceDoc>(
     anonId: { type: String, required: true, index: true },
     ua: { type: String },
     path: { type: String },
-    lastSeen: { type: Date, default: () => new Date(), index: true },
+    // שים לב: בלי index: true – רק default
+    lastSeen: { type: Date, default: () => new Date() },
   },
   { timestamps: true },
 );
 
 // TTL: מסמכים נמחקים 5 דקות אחרי העדכון
+// זה האינדקס היחיד על lastSeen בסכימה הזו
 PresenceSchema.index({ lastSeen: 1 }, { expireAfterSeconds: 300 });
 
 export default (mongoose.models.Presence as mongoose.Model<PresenceDoc>) ||
