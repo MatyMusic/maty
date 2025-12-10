@@ -5,7 +5,6 @@ import clsx from "clsx";
 import * as React from "react";
 
 export type MatyButtonVariant = "primary" | "secondary" | "outline" | "ghost";
-
 export type MatyButtonSize = "sm" | "md" | "lg" | "icon";
 
 export type MatyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -14,11 +13,6 @@ export type MatyButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   fullWidth?: boolean;
 };
 
-/**
- * כפתור בסיסי ל-MATY:
- * - עובד גם כ-default export וגם כ-named export (Button)
- * - תומך ב-variant / size / disabled
- */
 export function Button(props: MatyButtonProps) {
   const {
     className,
@@ -34,14 +28,12 @@ export function Button(props: MatyButtonProps) {
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500",
     disabled && "opacity-60 cursor-not-allowed",
     !disabled && "hover:scale-[1.02] active:scale-[0.98]",
-    // וריאנטים
     variant === "primary" &&
       "bg-indigo-600 text-white shadow-md hover:bg-indigo-700",
     variant === "secondary" && "bg-slate-800 text-slate-100 hover:bg-slate-900",
     variant === "outline" &&
       "border border-slate-500 text-slate-100 bg-transparent hover:bg-slate-800",
     variant === "ghost" && "bg-transparent text-slate-100 hover:bg-slate-800",
-    // גדלים
     size === "sm" && "text-sm px-3 py-1.5",
     size === "md" && "text-sm px-4 py-2",
     size === "lg" && "text-base px-5 py-2.5",
@@ -53,5 +45,4 @@ export function Button(props: MatyButtonProps) {
   return <button className={classes} disabled={disabled} {...rest} />;
 }
 
-// תאימות ל-import default:  import Button from "@/maty/ui/button"
 export default Button;

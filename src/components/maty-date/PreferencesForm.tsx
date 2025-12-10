@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import AgeRange from "@/maty/ui/AgeRange";
-import Button from "@/maty/ui/button";
+import Button from "@/maty/ui/Button";
 import { showToast } from "@/maty/ui/Toaster";
 
 export default function PreferencesForm() {

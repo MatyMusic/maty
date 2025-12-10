@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/maty/ui/accordion";
 import { Badge } from "@/maty/ui/badge";
-import { Button } from "@/maty/ui/button"; // ✅ fix import path
+import { Button } from "@/maty/ui/Button"; // ✅ fix import path
 import { Card, CardContent, CardHeader, CardTitle } from "@/maty/ui/card";
 import { Input } from "@/maty/ui/input";
 import { Separator } from "@/maty/ui/separator";
