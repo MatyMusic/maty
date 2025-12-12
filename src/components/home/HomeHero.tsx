@@ -872,7 +872,7 @@ function CTA3DCard({ item, i }: { item: CTA; i: number }) {
   );
 }
 
-/* ================== AiHeroBar ================== */
+/* ================== AiHeroBar – כרטיס כהה, קטן, עם X ברור ================== */
 
 function AiHeroBar({
   matyAiEnabled,
@@ -888,15 +888,57 @@ function AiHeroBar({
     session?.user?.email?.split("@")[0] ||
     "אורח";
 
+  const backendAvailable = matyAiEnabled || googleAiEnabled;
+
+  const [hidden, setHidden] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [suggestions, setSuggestions] = useState<AiSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<AiSuggestion[]>([
+    {
+      id: "fallback-a",
+      title: "סט חופה + ריקודים",
+      text: "בקש מ־MATY-AI לבנות סט חופה, סלואו ומעגלים ראשון לפי הסגנון שלך.",
+      kind: "setlist",
+    },
+    {
+      id: "fallback-b",
+      title: "טקסט לשיר 'המכבים של 443'",
+      text: "תן למנוע לכתוב לך בית ופזמון על החיים באבטחה, בדרך שלך.",
+      kind: "lyrics",
+    },
+    {
+      id: "fallback-c",
+      title: "טיפים לסאונד באירוע",
+      text: "שאל את MATY-AI איך למקם רמקולים ומוניטורים באולם קטן.",
+      kind: "tip",
+    },
+  ]);
   const [error, setError] = useState<string | null>(null);
 
-  const anyAi = matyAiEnabled || googleAiEnabled;
+  // לבדוק אם המשתמש כבר סגר בעבר את הבאנר
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const v = window.localStorage.getItem("mm:hero:ai:hidden");
+      if (v === "1") setHidden(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const close = () => {
+    setHidden(true);
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("mm:hero:ai:hidden", "1");
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   const loadSuggestions = useCallback(
     async (reason: "mount" | "click") => {
-      if (!anyAi) return;
+      if (!backendAvailable) return; // נשארים על דמו
       setLoading(true);
       setError(null);
       try {
@@ -927,104 +969,130 @@ function AiHeroBar({
           kind: it.kind || it.type || "idea",
         }));
 
-        if (!mapped.length) {
-          setSuggestions([
-            {
-              id: "fallback-a",
-              title: "סט קאנטרי-חסידי לחתונה",
-              text: "פתיחה חסידית, אמצע קאנטרי באנגלית, סיום מעגלים מקפיץ.",
-              kind: "setlist",
-            },
-            {
-              id: "fallback-b",
-              title: "טקסט לשיר מקורי",
-              text: "בקש מ־AI לכתוב בית ופזמון על 'המכבים של 443' באווירת קאנטרי.",
-              kind: "lyrics",
-            },
-          ]);
-        } else {
-          setSuggestions(mapped);
-        }
+        if (mapped.length) setSuggestions(mapped);
       } catch (err: any) {
         console.error(err);
-        setError("לא הצלחתי לטעון הצעות AI כרגע.");
+        setError("לא הצלחתי לטעון הצעות AI כרגע, אפשר להשתמש בדמו.");
       } finally {
         setLoading(false);
       }
     },
-    [anyAi],
+    [backendAvailable],
   );
 
   useEffect(() => {
-    if (anyAi) void loadSuggestions("mount");
-  }, [anyAi, loadSuggestions]);
+    if (backendAvailable) void loadSuggestions("mount");
+  }, [backendAvailable, loadSuggestions]);
+
+  if (hidden) return null;
+
+  const anyAiVisual = backendAvailable;
 
   return (
     <section
-      className="mx-auto max-w-6xl px-4 pt-4 md:pt-6 pb-3 md:pb-4"
+      className="mx-auto max-w-4xl px-4 pt-3 md:pt-4 pb-2 md:pb-3"
       dir="rtl"
     >
-      <div className="rounded-3xl border border-black/10 dark:border-white/10 bg-gradient-to-l from-violet-700/90 via-violet-600/95 to-fuchsia-600/90 text-white shadow-lg overflow-hidden relative">
+      <motion.div
+        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="relative rounded-2xl border border-neutral-700 bg-neutral-950/92 text-white backdrop-blur-md shadow-xl overflow-hidden"
+      >
+        {/* קו דק של אור, לא בלוק סגול גדול */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-60"
+          className="pointer-events-none absolute top-0 inset-x-0 h-[2px]"
           style={{
-            backgroundImage:
-              "radial-gradient(circle at 10% 0%, rgba(255,255,255,0.35), transparent 60%), radial-gradient(circle at 80% 100%, rgba(255,255,255,0.20), transparent 60%)",
+            background:
+              "linear-gradient(90deg, rgba(129,140,248,1), rgba(236,72,153,0.9))",
           }}
         />
 
-        <div className="relative z-[1] flex flex-col md:flex-row items-start gap-4 md:gap-6 p-4 md:p-5">
-          <div className="flex-1 text-right">
-            <div className="flex items-center justify-end gap-2 text-[11px] font-semibold mb-1">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-[2px] border border-white/20">
+        {/* X בצד ימין למעלה */}
+        <button
+          type="button"
+          onClick={close}
+          aria-label="סגירת חלונית ה-AI"
+          className="absolute right-3 top-3 z-[5] inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/50 border border-white/20 text-sm hover:bg-black/80 transition"
+        >
+          ✕
+        </button>
+
+        <div className="relative z-[1] flex flex-col md:flex-row items-stretch gap-3 md:gap-4 p-3.5 md:p-4">
+          {/* טקסט ברוך הבא */}
+          <div className="flex-1 text-right flex flex-col justify-center gap-1.5">
+            <div className="flex items-center justify-end gap-2 text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-[2px] border border-white/15">
                 <span
                   className={cx(
                     "h-1.5 w-1.5 rounded-full animate-pulse",
-                    anyAi ? "bg-emerald-400" : "bg-yellow-300",
+                    anyAiVisual ? "bg-emerald-400" : "bg-amber-400",
                   )}
                 />
-                {anyAi
-                  ? "AI מחובר · MATY-AI + Google"
-                  : "מצב AI: צריך חיבור לשרת"}
+                {anyAiVisual ? "MATY-AI מחובר" : "מצב דמו · שרת AI לא מחובר"}
               </span>
-              {googleAiEnabled && (
-                <span className="hidden sm:inline text-[11px] opacity-80">
-                  Google-style AI דרך ה־Backend פעיל ✅
-                </span>
-              )}
             </div>
 
-            <h2 className="text-lg md:text-xl font-extrabold leading-tight">
-              שלום {name}, בוא ניתן ל־AI להכין איתך את הסט הבא 🎧
-            </h2>
-            <p className="mt-1 text-xs md:text-sm opacity-90 max-w-xl ml-auto">
-              מכאן אתה יוצא עם רעיונות לסטים, טקסטים לשירים, פתיחים לאירועים
-              וטיפים לשדרוג ההופעה – הכל בכמה לחיצות.
+            <div className="flex items-center justify-end gap-2 mt-0.5">
+              <div className="flex flex-col">
+                <span className="text-[11px] opacity-80">
+                  ברוך הבא ל־MATY-MUSIC
+                </span>
+                <span className="text-sm md:text-base font-extrabold leading-tight">
+                  שלום {name}, בוא ניתן ל־AI לחשוב איתך על הסט הבא 🎧
+                </span>
+              </div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-xl shadow-md">
+                🤖
+              </div>
+            </div>
+
+            <p className="mt-1 text-[11px] md:text-xs opacity-85 max-w-xl ml-auto">
+              מכאן אתה יוצא עם רעיונות לסטים, טקסטים לשירים וטיפים לסאונד – כבר
+              לא מתחיל דף לבן לפני אירוע.
             </p>
+
+            <div className="mt-1.5 flex justify-start md:justify-end gap-2">
+              <Link
+                href="/ai"
+                className="inline-flex items-center gap-1.5 rounded-full bg-violet-600 text-white text-[11px] md:text-xs px-3 py-[6px] shadow hover:bg-violet-500 transition"
+              >
+                <span>פתח מסך MATY-AI</span>
+                <span aria-hidden>↗</span>
+              </Link>
+              <Link
+                href="/ai?mode=setlist"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-white/5 text-[11px] md:text-xs px-3 py-[6px] hover:bg-white/10 transition"
+              >
+                🎼
+                <span>סט חכם לערב הקרוב</span>
+              </Link>
+            </div>
           </div>
 
-          <div className="w-full md:w-[320px]">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="text-xs font-semibold opacity-90">
-                הצעות AI חכמות:
+          {/* צד שמאל – הצעות מהירות */}
+          <div className="w-full md:w-[340px]">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="text-[11px] md:text-xs font-semibold opacity-90">
+                הצעות פתיחה מהירות:
               </div>
               <button
                 type="button"
                 onClick={() => loadSuggestions("click")}
-                disabled={!anyAi || loading}
-                className="inline-flex items-center gap-1 rounded-full bg-white/15 hover:bg-white/25 px-2.5 py-[3px] text-[11px] border border-white/25 disabled:opacity-60 disabled:cursor-not-allowed transition"
+                disabled={loading || !backendAvailable}
+                className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2.5 py-[2px] text-[11px] border border-white/15 disabled:opacity-60 disabled:cursor-not-allowed transition"
               >
                 <span className={loading ? "animate-spin" : ""}>🔄</span>
-                לרענן
+                רענן
               </button>
             </div>
 
             {error && (
-              <div className="text-[11px] text-red-100 mb-2">{error}</div>
+              <div className="text-[11px] text-amber-400 mb-1.5">{error}</div>
             )}
 
-            <div className="grid grid-cols-1 gap-1.5">
+            <div className="flex flex-col gap-1.5 max-h-[150px] overflow-y-auto pr-0.5">
               {suggestions.map((s) => (
                 <Link
                   key={s.id}
@@ -1035,7 +1103,7 @@ function AiHeroBar({
                         ? "/ai?mode=lyrics"
                         : "/ai"
                   }
-                  className="group rounded-2xl bg-white/10 hover:bg-white/18 border border-white/20 px-3 py-2 text-[11px] md:text-xs transition"
+                  className="group rounded-2xl bg-white/5 hover:bg:white/10 border border-white/10 px-3 py-2 text-[11px] md:text-xs transition"
                 >
                   <div className="flex items-center justify-between gap-2 mb-[2px]">
                     <span className="font-semibold group-hover:underline">
@@ -1057,20 +1125,14 @@ function AiHeroBar({
 
               {loading && (
                 <div className="flex items-center gap-2 text-[11px] opacity-90">
-                  <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                  טוען הצעות AI...
-                </div>
-              )}
-
-              {!loading && !suggestions.length && (
-                <div className="text-[11px] opacity-90">
-                  הפעל AI בצד השרת וקבל כאן רעיונות חכמים לסטים וטקסטים.
+                  <span className="h-2 w-2 rounded-full bg-violet-300 animate-pulse" />
+                  טוען הצעות AI מהשרת...
                 </div>
               )}
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
@@ -1282,7 +1344,7 @@ function MetricsStrip() {
           {items.map((it) => (
             <div
               key={it.label}
-              className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-[3px] text-[11px] md:text-xs opacity-85"
+              className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg:white/5 px-2.5 py-[3px] text-[11px] md:text-xs opacity-85"
             >
               <span aria-hidden>{it.emoji}</span>
               <span className="font-semibold">{it.value}</span>
@@ -1294,7 +1356,7 @@ function MetricsStrip() {
           {items.map((it, idx) => (
             <div
               key={it.label + "-dup-" + idx}
-              className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg-white/5 px-2.5 py-[3px] text-[11px] md:text-xs opacity-70"
+              className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg:white/5 px-2.5 py-[3px] text-[11px] md:text-xs opacity-70"
             >
               <span aria-hidden>{it.emoji}</span>
               <span className="font-semibold">{it.value}</span>
@@ -1305,8 +1367,8 @@ function MetricsStrip() {
       </div>
 
       {highlight && (
-        <div className="mt-2 flex justify-end">
-          <div className="inline-flex items-center gap-2 rounded-2xl bg-black/5 dark:bg-white/5 px-3 py-2 text-[11px] md:text-xs">
+        <div className="mt-2 flex justify=end">
+          <div className="inline-flex items-center gap-2 rounded-2xl bg-black/5 dark:bg:white/5 px-3 py-2 text-[11px] md:text-xs">
             <span aria-hidden>💫</span>
             <div className="text-right">
               <div className="font-semibold">
@@ -1395,7 +1457,7 @@ function SystemStatusDock() {
       text = "Degraded";
     }
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg-white/5 px-2 py-[1px] text-[10px]">
+      <span className="inline-flex items-center gap-1 rounded-full bg-black/5 dark:bg:white/5 px-2 py-[1px] text-[10px]">
         <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
         <span>{label}</span>
         <span className="opacity-70">· {text}</span>
@@ -1407,7 +1469,7 @@ function SystemStatusDock() {
 
   return (
     <div className="fixed right-3 bottom-4 z-[60] hidden md:block" dir="rtl">
-      <div className="rounded-2xl bg-white/85 dark:bg-neutral-900/85 border border-black/10 dark:border-white/10 shadow-lg px-3 py-2 text-[10px] flex flex-col gap-1.5 max-w-[260px]">
+      <div className="rounded-2xl bg-white/85 dark:bg-neutral-900/85 border border-black/10 dark:border:white/10 shadow-lg px-3 py-2 text-[10px] flex flex-col gap-1.5 max-w-[260px]">
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">סטטוס מערכות</span>
           <span className="opacity-70">
@@ -1503,12 +1565,50 @@ function normalizeToMiniTrack(it: any, key: CategoryKey): MiniTrack | null {
 /* ================== MAIN: HomeHero ================== */
 
 export default function HomeHero() {
-  const t = useT();
+  const rawT = useT() as any;
   const { data: session } = useSession();
   const isAdmin = isAdminFromSession(session);
   const matyAiEnabled = useMatyAiEnabled();
   const googleAiEnabled = useGoogleAiEnabled();
   const CTAS = useCTAsFiltered(isAdmin, matyAiEnabled);
+
+  /** עטיפת תרגום בטוחה – תמיד מחזירה טקסט נורמלי */
+  const T = useCallback(
+    (key: string, fallback: string): string => {
+      try {
+        const res = rawT ? rawT(key, fallback) : undefined;
+        if (!res) return fallback;
+        if (typeof res === "string") {
+          if (res === key) return fallback;
+          if (
+            res.startsWith("home.") ||
+            res.startsWith("site.") ||
+            res.startsWith("events.")
+          ) {
+            return fallback;
+          }
+        }
+        return res;
+      } catch {
+        return fallback;
+      }
+    },
+    [rawT],
+  );
+
+  const siteBrand = T(
+    "site.brand",
+    "MATY-MUSIC · מוזיקה חיה, ניגונים ושידוכים",
+  );
+
+  const ctaTitle = T(
+    "home.ctaSectionTitle",
+    "מה בא לך לעשות עכשיו עם MATY-MUSIC?",
+  );
+  const ctaSubtitle = T(
+    "home.ctaSectionSubtitle",
+    "בחר מסלול – הופעות, ניגונים, שידוכים וקהילה – והמשך משם.",
+  );
 
   const [mounted, setMounted] = useState(false);
   const [cats, setCats] = useState<Cat[]>(CATS_DEMO);
@@ -1554,6 +1654,21 @@ export default function HomeHero() {
     };
   }, []);
 
+  // CTA-ים אחרי תרגום בטוח – אם מישהו ישים מפתחות בקונפיג, זה עדיין יצא עברית
+  const CTAS_WITH_TEXT = useMemo(
+    () =>
+      CTAS.map((c) => {
+        const base = `home.cta.${c.key}`;
+        return {
+          ...c,
+          title: T(`${base}.title`, c.title),
+          subtitle: T(`${base}.subtitle`, c.subtitle),
+          badge: c.badge ? T(`${base}.badge`, c.badge) : c.badge,
+        };
+      }),
+    [CTAS, T],
+  );
+
   if (!mounted) return null;
 
   return (
@@ -1574,7 +1689,7 @@ export default function HomeHero() {
         className="relative z-[1] mx-auto max-w-6xl px-4 pt-3 md:pt-4"
         dir="rtl"
       >
-        <h1 className="sr-only">{t("site.brand")}</h1>
+        <h1 className="sr-only">{siteBrand}</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
           {cats.map((cat, i) => (
             <AvatarCard key={cat.key} cat={cat} i={i} />
@@ -1594,7 +1709,7 @@ export default function HomeHero() {
             transition={{ duration: 0.5 }}
             className="text-2xl font-extrabold md:text-3xl"
           >
-            {t("home.ctaSectionTitle")}
+            {ctaTitle}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -1603,19 +1718,19 @@ export default function HomeHero() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mt-1 opacity-80"
           >
-            {t("home.ctaSectionSubtitle")}
+            {ctaSubtitle}
           </motion.p>
         </div>
 
         <div className="mx-auto max-w-5xl relative z-[6]">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 justify-items-stretch">
-            {CTAS.slice(0, 3).map((c, i) => (
+            {CTAS_WITH_TEXT.slice(0, 3).map((c, i) => (
               <CTA3DCard key={c.href} item={c} i={i} />
             ))}
           </div>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 justify-items-stretch">
-            {CTAS.slice(3).map((c, i) => (
+            {CTAS_WITH_TEXT.slice(3).map((c, i) => (
               <CTA3DCard key={c.href} item={c} i={i + 3} />
             ))}
           </div>

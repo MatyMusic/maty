@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "fetch:spotify-albums": "tsx scripts/fetch-spotify-albums.ts",
     "env:check": "node -e \"require('dotenv').config({path:'.env.local'}); ['MONGODB_URI','NEXTAUTH_URL','NEXTAUTH_SECRET','GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','ADMIN_EMAIL','SUPERADMINS','MONGODB_URI_NIGUNIM','MONGODB_DB_NIGUNIM','YOUTUBE_API_KEY','SPOTIFY_CLIENT_ID','SPOTIFY_CLIENT_SECRET','SPOTIFY_REFRESH_TOKEN'].forEach(k=>{console.log(process.env[k]?('✅ '+k):('❌ '+k+' missing'))})\"",
     "fit:ensure-indexes": "tsx -r dotenv/config -r tsconfig-paths/register src/scripts/fit-ensure-indexes.ts",
     "fit:import": "cross-env DOTENV_CONFIG_PATH=.env.local tsx -r dotenv/config -r tsconfig-paths/register src/scripts/fit-import.ts",
@@ -105,7 +106,7 @@
     "tailwindcss": "^3.4.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.19.2",
+    "tsx": "^4.21.0",
     "typescript": "5.5.4",
     "yargs": "^18.0.0"
   }

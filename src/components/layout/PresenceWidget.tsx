@@ -1,7 +1,7 @@
 // src/components/layout/PresenceWidget.tsx
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /** ← הרחבתי סוג קיים, נשאר backward-compatible */
 type Nearby = {

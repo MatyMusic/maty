@@ -164,7 +164,7 @@ function LanguageToggleInline({ className = "" }: { className?: string }) {
 }
 
 /* ╭─────────────────────────────────────────────────────────╮
-   │ Presence – מי סביבי                                    │
+   │ Presence – מי מחובר ומי סביבי                          │
    ╰─────────────────────────────────────────────────────────╯ */
 type NearbyUser = {
   id: string;
@@ -173,17 +173,52 @@ type NearbyUser = {
   sinceSec?: number;
   avatar?: string;
 };
-function usePresenceCount(pollMs = 15000) {
-  const [count, setCount] = useState(0);
+
+type PresenceSummary = {
+  onlineTotal: number;
+  updatedAt: string | null;
+};
+
+function usePresenceSummary(pollMs = 15000): PresenceSummary {
+  const [summary, setSummary] = useState<PresenceSummary>({
+    onlineTotal: 0,
+    updatedAt: null,
+  });
+
   useEffect(() => {
     let dead = false;
+
     const tick = async () => {
       try {
         const r = await fetch("/api/presence/count", { cache: "no-store" });
         const j = await r.json().catch(() => null);
-        if (!dead && j && typeof j.count === "number") setCount(j.count);
-      } catch {}
+        if (!j || dead) return;
+
+        const onlineTotalRaw =
+          typeof j.total === "number"
+            ? j.total
+            : typeof j.count === "number"
+              ? j.count
+              : 0;
+
+        const onlineTotal = Number.isFinite(onlineTotalRaw)
+          ? onlineTotalRaw
+          : 0;
+
+        setSummary({
+          onlineTotal,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch {
+        if (!dead) {
+          setSummary((prev) => ({
+            ...prev,
+            updatedAt: prev.updatedAt ?? null,
+          }));
+        }
+      }
     };
+
     tick();
     const id = setInterval(tick, pollMs);
     return () => {
@@ -191,8 +226,10 @@ function usePresenceCount(pollMs = 15000) {
       clearInterval(id);
     };
   }, [pollMs]);
-  return count;
+
+  return summary;
 }
+
 function useNearby(open: boolean) {
   const [loading, setLoading] = useState(false);
   const [list, setList] = useState<NearbyUser[]>([]);
@@ -217,14 +254,21 @@ function useNearby(open: boolean) {
   }, [open]);
   return { loading, list };
 }
-function PresenceBadge({ onOpen }: { onOpen: () => void }) {
-  const count = usePresenceCount();
+
+function PresenceBadge({
+  onOpen,
+  count,
+}: {
+  onOpen: () => void;
+  count: number;
+}) {
+  const safeCount = Number.isFinite(count) && count > 0 ? count : 0;
   return (
     <button
       type="button"
       onClick={onOpen}
       className="inline-flex h-9 md:h-10 items-center gap-2 rounded-full px-3 border border-emerald-500/30 bg-white/85 dark:bg-neutral-900/75 hover:bg-white dark:hover:bg-neutral-800/80 shadow-sm mm-glow-green"
-      title="מי סביבי"
+      title="מי מחובר ומי סביבי"
     >
       <span className="relative h-2.5 w-2.5 rounded-full bg-emerald-500">
         <span
@@ -233,20 +277,32 @@ function PresenceBadge({ onOpen }: { onOpen: () => void }) {
         />
       </span>
       <span className="text-xs md:text-sm font-semibold">מי סביבי</span>
-      <span className="text-xs md:text-sm font-bold tabular-nums">{count}</span>
+      <span className="text-[11px] md:text-xs opacity-80">
+        {safeCount > 0 ? "מחוברים עכשיו:" : "מחוברים"}
+      </span>
+      <span className="text-xs md:text-sm font-bold tabular-nums">
+        {safeCount > 999 ? "999+" : safeCount}
+      </span>
     </button>
   );
 }
+
 function AroundMePanel({
   open,
   onClose,
+  onlineTotal,
 }: {
   open: boolean;
   onClose: () => void;
+  onlineTotal: number;
 }) {
   const { loading, list } = useNearby(open);
   useScrollLock(open);
   if (!open) return null;
+
+  const safeTotal =
+    Number.isFinite(onlineTotal) && onlineTotal > 0 ? onlineTotal : 0;
+
   return (
     <div
       role="dialog"
@@ -260,7 +316,14 @@ function AroundMePanel({
         className="absolute right-3 top-[88px] w-[min(96vw,560px)] rounded-2xl border border-emerald-400/30 dark:border-emerald-300/20 bg-white/97 dark:bg-neutral-950/95 shadow-2xl p-4 mm-glow-card"
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="font-bold text-sm md:text-base">מי סביבי עכשיו</div>
+          <div className="space-y-0.5">
+            <div className="font-bold text-sm md:text-base">מי סביבי עכשיו</div>
+            <div className="text-[11px] md:text-xs opacity-70">
+              {safeTotal > 0
+                ? `סה״כ מחוברים במערכת: ${safeTotal}`
+                : "מציג מחוברים לידך מתוך המשתמשים באתר"}
+            </div>
+          </div>
           <button className="mm-btn" onClick={onClose}>
             ✕
           </button>
@@ -289,14 +352,16 @@ function AroundMePanel({
                   </div>
                   <div className="text-xs opacity-70 truncate">
                     {u.city ? `עיר: ${u.city}` : "מיקום לא ידוע"} •{" "}
-                    {u.sinceSec ? `${u.sinceSec}s מחובר` : "מחובר"}
+                    {u.sinceSec ? `${u.sinceSec}s מחובר` : "מחובר עכשיו"}
                   </div>
                 </div>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="text-sm opacity-70">אין נתונים כרגע.</div>
+          <div className="text-sm opacity-70">
+            כרגע לא נמצאו משתמשים קרובים. ייתכן שאתה הראשון פה 🙂
+          </div>
         )}
       </div>
     </div>
@@ -718,7 +783,10 @@ function useLocalPlaceAndTime() {
 /* ╭─────────────────────────────────────────────────────────╮
    │ AI Quick Search – חיפוש חכם בכל האתר                   │
    ╰─────────────────────────────────────────────────────────╯ */
-function AiQuickSearch() {
+/* ╭─────────────────────────────────────────────────────────╮
+   │ AI Quick Search – חיפוש חכם בכל האתר                   │
+   ╰─────────────────────────────────────────────────────────╯ */
+function AiQuickSearch({ className = "" }: { className?: string }) {
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -736,25 +804,69 @@ function AiQuickSearch() {
   return (
     <form
       onSubmit={onSubmit}
-      className="hidden lg:flex items-center ml-2 min-w-[260px] max-w-[340px]"
+      className={[
+        "hidden lg:flex items-center min-w-[230px] max-w-[320px]",
+        className,
+      ].join(" ")}
       dir="rtl"
     >
-      <div className="flex w-full items-center rounded-full bg-gradient-to-r from-violet-500/70 via-emerald-500/70 to-sky-500/70 p-[1px] shadow-[0_8px_24px_rgba(15,23,42,0.25)]">
-        <div className="flex w-full items-center gap-2 rounded-full bg-white/95 dark:bg-neutral-900/95 px-3 py-1.5">
-          <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/50 bg-violet-500/10 px-2 py-0.5 text-[11px] font-semibold text-violet-700 dark:text-violet-200">
+      <div
+        className={`
+          flex w-full items-center
+          rounded-full border border-emerald-400/60
+          bg-gradient-to-r from-violet-600/80 via-emerald-500/80 to-sky-500/80
+          p-[2px]
+          shadow-[0_10px_26px_rgba(15,23,42,0.45)]
+        `}
+      >
+        <div
+          className={`
+            flex w-full items-center gap-2
+            rounded-full bg-slate-950/95 dark:bg-neutral-950/95
+            px-3 py-1.5
+          `}
+        >
+          <span
+            className={`
+              inline-flex items-center gap-1
+              rounded-full border border-violet-400/60
+              bg-violet-500/15
+              px-1.5 py-0.5
+              text-[10px] font-semibold
+              text-violet-100
+              whitespace-nowrap
+            `}
+          >
             <span aria-hidden>✨</span>
             <span>AI</span>
           </span>
+
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="חיפוש חכם בכל MATY…"
-            className="flex-1 bg-transparent text-xs md:text-sm outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+            className={`
+              flex-1 bg-transparent
+              text-[11px] md:text-xs
+              outline-none
+              placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+            `}
           />
+
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-semibold text-white shadow-sm hover:bg-emerald-500 disabled:opacity-60"
+            className={`
+              inline-flex items-center gap-1
+              rounded-full
+              px-3 py-1.5
+              text-[10px] font-semibold
+              bg-emerald-500 text-white
+              shadow-[0_6px_16px_rgba(16,185,129,0.55)]
+              hover:bg-emerald-400
+              disabled:opacity-60
+              whitespace-nowrap
+            `}
           >
             {busy ? (
               <span className="h-3 w-3 animate-spin rounded-full border border-white/40 border-t-transparent" />
@@ -816,6 +928,10 @@ export default function Header() {
 
   const baseAvatar = (session?.user as any)?.image || null;
   const myAvatar = liveAvatar || customAvatar || baseAvatar || DEFAULT_AVATAR;
+
+  // Presence – סיכום כמות מחוברים
+  const presence = usePresenceSummary();
+  const onlineTotal = presence.onlineTotal;
 
   useEffect(() => {
     let navBC: BroadcastChannel | null = null;
@@ -1026,6 +1142,10 @@ export default function Header() {
     text-sm font-extrabold whitespace-nowrap truncate bg-brand text-white border-0
     shadow-lg shadow-brand/30 hover:opacity-95 mm-glow-brand`;
 
+  const musicChip = [
+    chip,
+    "mm-chip mm-chip-music text-violet-700 dark:text-violet-100",
+  ].join(" ");
   const clubChip = [chip, "mm-chip mm-chip-club"].join(" ");
   const jamChip = [chip, "mm-chip mm-chip-jam"].join(" ");
   const fitChip = [
@@ -1080,7 +1200,7 @@ export default function Header() {
         <AssistantFloatingAvatar onOpen={() => setAssistantOpen(true)} />
       </div>
 
-      {/* שורה #1: פס סטטוס עליון */}
+      {/* שורה #1: פס סטטוס עליון – כולל מי סביבי + חיפוש AI קומפקטי */}
       <div className="bg-amber-50/70 dark:bg-amber-900/15 border-b border-amber-400/30 dark:border-amber-300/20">
         <div className="mx-auto max-w-6xl px-4 py-1 text-[12px] flex items-center gap-4 sm:gap-6">
           <div className="flex items-center gap-2 min-w-0">
@@ -1107,7 +1227,10 @@ export default function Header() {
             </div>
           </div>
 
-          <PresenceBadge onOpen={() => setAroundOpen(true)} />
+          <PresenceBadge
+            onOpen={() => setAroundOpen(true)}
+            count={onlineTotal}
+          />
 
           <MessagesBadge
             enabled={meLite.loggedIn}
@@ -1115,6 +1238,14 @@ export default function Header() {
               window.location.href = "/messages";
             }}
           />
+
+          {/* ספירת מחוברים טקסטואלית – מודגש */}
+          <div className="hidden sm:flex items-center gap-1 text-[11px] opacity-80">
+            <span>מחוברים עכשיו באתר:</span>
+            <span className="font-bold tabular-nums">
+              {onlineTotal > 999 ? "999+" : onlineTotal}
+            </span>
+          </div>
 
           {isAdmin && (
             <>
@@ -1124,13 +1255,16 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setAdminOpen(true)}
-                className="inline-flex h-8 items-center gap-2 rounded-full px-3 border border-amber-500/40 dark:border-amber-300/40 bg-white/90 dark:bg-neutral-900/85 hover:bg-white dark:hover:bg-neutral-800 text-[12px] font-bold mm-glow-amber ml-auto"
+                className="hidden md:inline-flex h-8 items-center gap-2 rounded-full px-3 border border-amber-500/40 dark:border-amber-300/40 bg-white/90 dark:bg-neutral-900/85 hover:bg-white dark:hover:bg-neutral-800 text-[12px] font-bold mm-glow-amber"
                 title="פתח פאנל אדמין"
               >
                 🛠 פאנל ניהול
               </button>
             </>
           )}
+
+          {/* חיפוש AI קטן – בצד שמאל של הקונטיינר (בדסקטופ בלבד) */}
+          <AiQuickSearch className="ml-auto" />
         </div>
       </div>
 
@@ -1177,6 +1311,25 @@ export default function Header() {
             aria-label="ניווט ראשי"
             className="hidden md:flex flex-wrap items-center content-start justify-end gap-2 min-h-[52px]"
           >
+            {/* מוזיקה – הבית של MATY MUSIC */}
+            <Link
+              href="/music"
+              className={[
+                musicChip,
+                starts("/music") || pathname === "/"
+                  ? "ring-1 ring-violet-400/60"
+                  : "",
+              ].join(" ")}
+              title="מוזיקה וניגונים"
+              onMouseEnter={() => emitHover("club")}
+              onMouseLeave={() => emitHover(null)}
+            >
+              <span className="relative z-[1] bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent font-extrabold">
+                מוזיקה
+              </span>
+              <span aria-hidden className="mm-bubbles mm-bubbles-violet" />
+            </Link>
+
             <Link
               href="/club"
               className={[
@@ -1311,9 +1464,6 @@ export default function Header() {
                 </div>
               )}
             </div>
-
-            {/* חיפוש AI אונליין בכל האתר – מעוצב */}
-            <AiQuickSearch />
 
             {/* CTA MATY-DATE – שידוכים */}
             <Link
@@ -1454,7 +1604,11 @@ export default function Header() {
           onClose={() => setAssistantOpen(false)}
         />
       )}
-      <AroundMePanel open={aroundOpen} onClose={() => setAroundOpen(false)} />
+      <AroundMePanel
+        open={aroundOpen}
+        onClose={() => setAroundOpen(false)}
+        onlineTotal={onlineTotal}
+      />
       <AdminPanelDrawer open={adminOpen} onClose={() => setAdminOpen(false)} />
 
       {/* ── Glow + Animations ── */}
@@ -1734,7 +1888,6 @@ function UserMenu({ name, image, onSignOut }: UserMenuProps) {
         >
           <Link
             href="/profile"
-            // href="/me"
             className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
           >
             <span>הפרופיל שלי</span>
@@ -1767,7 +1920,6 @@ function UserMenu({ name, image, onSignOut }: UserMenuProps) {
     </div>
   );
 }
-
 /* ╭─────────────────────────────────────────────────────────╮
    │ MobileDrawer – ניווט מלא במובייל                        │
    ╰─────────────────────────────────────────────────────────╯ */
@@ -1819,7 +1971,7 @@ function MobileDrawer({
         dir="rtl"
         className="absolute inset-y-0 right-0 w-[min(92vw,420px)] bg-white dark:bg-neutral-900 border-l border-black/20 dark:border-white/20 shadow-[0_5px_40px_rgba(0,0,0,0.45)] flex flex-col z-[500]"
       >
-        {/* כותרת + משתמש */}
+        {/* כותרת + משתמש + כניסה/יציאה */}
         <div className="px-4 pt-3 pb-2 border-b border-black/5 dark:border-white/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <img
@@ -1839,156 +1991,7 @@ function MobileDrawer({
               </div>
             </div>
           </div>
-          <button className="mm-btn text-sm" type="button" onClick={onClose}>
-            ✕
-          </button>
-        </div>
-
-        {/* ניווט ראשי */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-          <div className="grid gap-2">
-            <Link
-              href="/club"
-              onClick={onClose}
-              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-amber-50/70 dark:bg-amber-900/20 border border-amber-300/60"
-            >
-              <span className="font-semibold">MATY-CLUB</span>
-              <span aria-hidden>🎧</span>
-            </Link>
-            <Link
-              href="/jam"
-              onClick={onClose}
-              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-violet-50/70 dark:bg-violet-900/25 border border-violet-300/60"
-            >
-              <span className="font-semibold">MATY-JAM</span>
-              <span aria-hidden>🎸</span>
-            </Link>
-            <Link
-              href="/fit"
-              onClick={onClose}
-              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-emerald-50/70 dark:bg-emerald-900/20 border border-emerald-300/60"
-            >
-              <span className="font-semibold">MATY-FIT</span>
-              <span aria-hidden>💪</span>
-            </Link>
-            <Link
-              href={dateHref}
-              onClick={onClose}
-              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 text-white border border-rose-300/60"
-            >
-              <span className="font-semibold">MATY-DATE – שידוכים</span>
-              <span aria-hidden>❤</span>
-            </Link>
-            <Link
-              href="/book"
-              onClick={onClose}
-              className="flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-brand text-white border border-brand/80"
-            >
-              <span className="font-semibold">הזמן הופעה</span>
-              <span aria-hidden>🎤</span>
-            </Link>
-          </div>
-
-          {/* דפים נוספים */}
-          <div className="mt-2 border-t border-black/5 dark:border-white/10 pt-3">
-            <div className="text-xs font-semibold mb-2 opacity-70">
-              דפים נוספים
-            </div>
-            <div className="grid gap-1.5 text-sm">
-              <Link
-                href="/events"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>אירועים</span>
-                <span aria-hidden>📅</span>
-              </Link>
-              <Link
-                href="/gallery"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>גלריה</span>
-                <span aria-hidden>🖼</span>
-              </Link>
-              <Link
-                href="/pricing"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>מחירון</span>
-                <span aria-hidden>💳</span>
-              </Link>
-              <Link
-                href="/shorts"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>Shorts</span>
-                <span aria-hidden>🎬</span>
-              </Link>
-              <Link
-                href="/messages"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>ההודעות שלי</span>
-                <span aria-hidden>✉️</span>
-              </Link>
-              <Link
-                href="/about"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>אודות</span>
-                <span aria-hidden>ℹ️</span>
-              </Link>
-              <Link
-                href="/contact"
-                onClick={onClose}
-                className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
-              >
-                <span>צור קשר</span>
-                <span aria-hidden>✉️</span>
-              </Link>
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  onClick={onClose}
-                  className="flex items-center justify-between rounded-xl px-3 py-1.5 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 text-amber-700 dark:text-amber-300"
-                >
-                  <span>אדמין</span>
-                  <span aria-hidden>🛠</span>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* כלים מהירים */}
-          <div className="mt-3 border-t border-black/5 dark:border-white/10 pt-3 space-y-2">
-            <button
-              type="button"
-              onClick={() => {
-                onAssistant();
-                onClose();
-              }}
-              className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm bg-sky-50/80 dark:bg-sky-900/25 border border-sky-300/60"
-            >
-              <span>שאל את העוזר החכם</span>
-              <span aria-hidden>✨</span>
-            </button>
-            <button
-              type="button"
-              onClick={onThemeToggle}
-              className="w-full flex items-center justify-between rounded-xl px-3 py-2 text-sm border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95"
-            >
-              <span>החלף מצב תצוגה</span>
-              <span aria-hidden>☀️ / 🌙</span>
-            </button>
-          </div>
-
-          {/* התחברות / התנתקות */}
-          <div className="mt-3 border-t border-black/5 dark:border-white/10 pt-3 space-y-2">
+          <div className="flex items-center gap-2">
             {user.loggedIn ? (
               <button
                 type="button"
@@ -1996,7 +1999,7 @@ function MobileDrawer({
                   onSignOut();
                   onClose();
                 }}
-                className="w-full flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50"
+                className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50"
               >
                 התנתק
               </button>
@@ -2005,14 +2008,14 @@ function MobileDrawer({
                 <Link
                   href="/auth?mode=login"
                   onClick={onClose}
-                  className="w-full flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95"
+                  className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95"
                 >
                   כניסה
                 </Link>
                 <Link
                   href="/auth?mode=register"
                   onClick={onClose}
-                  className="w-full flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold border border-emerald-500/50 bg-emerald-50/80 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-200"
+                  className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold border border-emerald-500/50 bg-emerald-50/80 dark:bg-emerald-900/25 text-emerald-700 dark:text-emerald-200"
                 >
                   הרשמה
                 </Link>
@@ -2022,13 +2025,209 @@ function MobileDrawer({
                     onGoogleSignIn();
                     onClose();
                   }}
-                  className="w-full flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-500"
+                  className="inline-flex items-center justify-center rounded-full px-3 py-1.5 text-[11px] font-semibold bg-emerald-600 text-white hover:bg-emerald-500 shadow-sm"
                 >
-                  התחברות עם Google
+                  Google
                 </button>
               </>
             )}
           </div>
+        </div>
+
+        {/* תוכן נגלל */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+          {/* פעולות מהירות */}
+          <div className="grid grid-cols-2 gap-2 text-[13px]">
+            <button
+              type="button"
+              onClick={() => {
+                onThemeToggle();
+              }}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 border border-black/10 dark:border-white/15 bg-white/95 dark:bg-neutral-900/95 text-right"
+            >
+              <span>מצב תצוגה</span>
+              <span aria-hidden>🌗</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onAssistant();
+                onClose();
+              }}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 border border-violet-400/40 bg-violet-50/70 dark:bg-violet-900/25 text-right"
+            >
+              <span>שאל את העוזר</span>
+              <span aria-hidden>✨</span>
+            </button>
+          </div>
+
+          {/* ניווט ראשי */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-semibold opacity-70 px-1">
+              ניווט ראשי
+            </div>
+            <Link
+              href="/"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm border border-transparent hover:border-violet-300/70 bg-white/95 dark:bg-neutral-900/95 hover:bg-violet-50/70 dark:hover:bg-neutral-800/80"
+            >
+              <span>דף הבית</span>
+              <span aria-hidden>🏠</span>
+            </Link>
+            <Link
+              href="/music"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm border border-transparent hover:border-violet-300/70 bg-white/95 dark:bg-neutral-900/95 hover:bg-violet-50/70 dark:hover:bg-neutral-800/80"
+            >
+              <span>מוזיקה וניגונים</span>
+              <span aria-hidden>🎵</span>
+            </Link>
+            <Link
+              href="/club"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm border border-transparent hover:border-amber-300/70 bg-white/95 dark:bg-neutral-900/95 hover:bg-amber-50/70 dark:hover:bg-neutral-800/80"
+            >
+              <span>MATY-CLUB</span>
+              <span aria-hidden>📣</span>
+            </Link>
+            <Link
+              href="/jam"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm border border-transparent hover:border-violet-300/70 bg-white/95 dark:bg-neutral-900/95 hover:bg-violet-50/70 dark:hover:bg-neutral-800/80"
+            >
+              <span>MATY-JAM</span>
+              <span aria-hidden>🎸</span>
+            </Link>
+            <Link
+              href="/fit"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm border border-transparent hover:border-emerald-300/70 bg-white/95 dark:bg-neutral-900/95 hover:bg-emerald-50/70 dark:hover:bg-neutral-800/80"
+            >
+              <span>MATY-FIT</span>
+              <span aria-hidden>💪</span>
+            </Link>
+          </div>
+
+          {/* MATY-DATE + הזמנת הופעה */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-semibold opacity-70 px-1">
+              חוויות מיוחדות
+            </div>
+            <Link
+              href={dateHref}
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 text-white shadow-[0_10px_24px_rgba(244,114,182,0.45)]"
+            >
+              <span>MATY-DATE – שידוכים חכמים</span>
+              <span aria-hidden>❤</span>
+            </Link>
+            <Link
+              href="/book"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-2xl px-3 py-2.5 text-sm font-bold bg-brand text-white shadow-lg shadow-brand/30"
+            >
+              <span>הזמן הופעה</span>
+              <span aria-hidden>🎤</span>
+            </Link>
+          </div>
+
+          {/* דפים נוספים */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-semibold opacity-70 px-1">
+              דפים נוספים
+            </div>
+            <Link
+              href="/events"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>אירועים</span>
+              <span aria-hidden>📅</span>
+            </Link>
+            <Link
+              href="/gallery"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>גלריה</span>
+              <span aria-hidden>🖼</span>
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>מחירון</span>
+              <span aria-hidden>💳</span>
+            </Link>
+            <Link
+              href="/shorts"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>Shorts</span>
+              <span aria-hidden>🎬</span>
+            </Link>
+            <Link
+              href="/about"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>אודות</span>
+              <span aria-hidden>ℹ️</span>
+            </Link>
+            <Link
+              href="/contact"
+              onClick={onClose}
+              className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+            >
+              <span>צור קשר</span>
+              <span aria-hidden>✉️</span>
+            </Link>
+            {user.loggedIn && (
+              <>
+                <Link
+                  href="/messages"
+                  onClick={onClose}
+                  className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+                >
+                  <span>ההודעות שלי</span>
+                  <span aria-hidden>📨</span>
+                </Link>
+                <Link
+                  href="/profile"
+                  onClick={onClose}
+                  className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm hover:bg-amber-50/70 dark:hover:bg-neutral-800/80 border border-transparent hover:border-amber-300/60"
+                >
+                  <span>הפרופיל שלי</span>
+                  <span aria-hidden>👤</span>
+                </Link>
+              </>
+            )}
+          </div>
+
+          {/* אזור אדמין */}
+          {isAdmin && (
+            <div className="space-y-2 border-t border-dashed border-amber-300/40 pt-3 mt-1">
+              <div className="text-[11px] font-semibold opacity-70 px-1 flex items-center gap-1">
+                <span>אדמין</span>
+                <span aria-hidden>⭐</span>
+              </div>
+              <Link
+                href="/admin"
+                onClick={onClose}
+                className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm bg-amber-100/80 dark:bg-amber-900/35 border border-amber-400/70"
+              >
+                <span>לוח ניהול</span>
+                <span aria-hidden>🛠</span>
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* שורת תחתונה קטנה */}
+        <div className="px-4 py-2 border-t border-black/5 dark:border-white/10 text-[10px] text-right opacity-60">
+          MATY MUSIC · חוויית מוזיקה, קהילה ושידוכים במקום אחד
         </div>
       </div>
     </div>

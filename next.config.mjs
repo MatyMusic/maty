@@ -71,6 +71,9 @@ const nextConfig = {
 
       // Wikipedia / misc
       { protocol: "https", hostname: "upload.wikimedia.org", pathname: "/**" },
+
+      // ✅ Spotify covers
+      { protocol: "https", hostname: "i.scdn.co", pathname: "/**" },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy:

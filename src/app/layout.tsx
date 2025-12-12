@@ -57,6 +57,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   applicationName: "MATY MUSIC",
 };
+
 export const viewport: Viewport = { themeColor: "#6d4aff" };
 
 /* ======================= i18n helpers ======================= */
@@ -65,11 +66,13 @@ const FALLBACK_LOCALES = ["he", "en", "fr", "ru", "es"] as const;
 function isSupportedLocaleInternal(lc: string): lc is Locale {
   const setAny: any = LOCALES_SET as any;
   const arrAny: any = SUPPORTED_LOCALES as any;
+
   const inSetFn =
     setAny && typeof setAny.has === "function" ? setAny.has(lc) : false;
   const inArr = Array.isArray(arrAny) ? arrAny.includes(lc) : false;
   const inSetAsArray = Array.isArray(setAny) ? setAny.includes(lc) : false;
   const inFallback = (FALLBACK_LOCALES as readonly string[]).includes(lc);
+
   return inSetFn || inArr || inSetAsArray || inFallback;
 }
 
@@ -92,6 +95,7 @@ async function detectIsAdmin(): Promise<boolean> {
     const flag = (session as any)?.user?.isAdmin === true;
     if (role === "admin" || role === "superadmin" || flag) return true;
   } catch {}
+
   try {
     if (await isBypassActiveServer()) return true;
   } catch {}
@@ -111,6 +115,7 @@ async function detectIsAdmin(): Promise<boolean> {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+
   if (emailCookie && allow.includes(emailCookie)) return true;
 
   return false;
@@ -132,6 +137,7 @@ export default async function RootLayout({
   const al = headerStore.get("accept-language") || "";
 
   let locale: Locale = "he";
+
   if (ck || ckNext) {
     locale = normalizeLocale(ck || ckNext || "he");
   } else {
@@ -139,6 +145,7 @@ export default async function RootLayout({
       .split(",")
       .map((s) => s.split(";")[0]?.trim())
       .filter(Boolean) as string[];
+
     let chosen: Locale | null = null;
     for (const p of parts) {
       const n = normalizeLocale(p);
@@ -220,6 +227,7 @@ export default async function RootLayout({
                     <Topbar />
                     <Header />
 
+                    {/* אפשר להשאיר את זה לעתיד או למחוק אם לא בשימוש */}
                     <div
                       id="__mobile_drawer_mount"
                       data-open="0"
@@ -254,7 +262,7 @@ export default async function RootLayout({
           </LocaleProvider>
         </ToastProvider>
 
-        {/* עוגן כללי לפורטלים */}
+        {/* עוגן כללי לפורטלים (AssistantPanel וכו׳) */}
         <div id="assistant-root" className="z-[99999]" />
       </body>
     </html>

@@ -1,44 +1,45 @@
 "use client";
 
+import { CONTACT } from "@/lib/constants";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CalendarDays,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Globe2,
+  HeartHandshake,
+  Info,
+  Loader2,
+  Mails,
+  MapPin,
+  MessageCircleHeart,
+  MessageSquareMore,
+  Music4,
+  NotebookPen,
+  Paperclip,
+  Phone,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Trash2,
+  UploadCloud,
+  Zap,
+} from "lucide-react";
 import React, {
+  ChangeEvent,
+  DragEvent,
+  FormEvent,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
-  FormEvent,
-  ChangeEvent,
-  DragEvent,
 } from "react";
-import { CONTACT } from "@/lib/constants";
 import { z } from "zod";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Phone,
-  Mails,
-  Send,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  CalendarDays,
-  ChevronRight,
-  ChevronLeft,
-  UploadCloud,
-  MessageSquareMore,
-  MessageCircleHeart,
-  Sparkles,
-  ShieldCheck,
-  NotebookPen,
-  Zap,
-  Globe2,
-  Info,
-  Trash2,
-  MapPin,
-  Paperclip,
-  Star,
-  HeartHandshake,
-  Music4,
-} from "lucide-react";
 
 /** ============================================================================
  *  ContactSection — גרסת "טורבו+" מעוצבת
@@ -51,6 +52,7 @@ import {
  *  - אנימציות Framer Motion + micro-interactions
  *  - Glass Cards + רקע גרדיאנטים מונפש
  *  - RTL מלא, ARIA, נגישות
+ *  - פריסת Layout ממורכזת למסכים רחבים (לא "מודבק" לימין)
  * ============================================================================ */
 
 type SendState = "idle" | "sending" | "ok" | "err";
@@ -430,6 +432,23 @@ function TextareaBase(
   );
 }
 
+/* כפתור לקישור שימושי בסיידבר */
+function UsefulLinkButton({ href, label }: { href: string; label: string }) {
+  return (
+    <motion.a
+      href={href}
+      whileHover={{ y: -1, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      className="group flex items-center justify-between rounded-2xl border border-neutral-200/70 dark:border-neutral-800/70 bg-white/80 dark:bg-neutral-950/80 px-3 py-2 text-sm font-medium"
+    >
+      <span className="truncate">{label}</span>
+      <span className="inline-flex items-center justify-center ms-2 h-6 w-6 rounded-full bg-violet-600/15 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-all">
+        <ArrowLeft className="w-3.5 h-3.5 rtl:rotate-180" />
+      </span>
+    </motion.a>
+  );
+}
+
 export default function ContactSection() {
   const [draft, setDraft] = useState<ContactDraft>(() => loadDraft());
   const [state, setState] = useState<SendState>("idle");
@@ -604,7 +623,7 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative py-16 sm:py-20"
+      className="relative py-16 sm:py-20 px-4 sm:px-6 lg:px-8 flex justify-center"
       dir="rtl"
       aria-live="polite"
     >
@@ -613,11 +632,11 @@ export default function ContactSection() {
         aria-hidden
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
-        <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl animate-[float_9s_ease-in-out_infinite]"></div>
-        <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl animate-[float_12s_ease-in-out_infinite]"></div>
-        <div className="absolute top-1/3 left-1/4 h-56 w-56 rounded-full bg-rose-500/10 blur-3xl animate-[float_14s_ease-in-out_infinite]"></div>
+        <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl animate-[float_9s_ease-in-out_infinite]" />
+        <div className="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-violet-500/20 blur-3xl animate-[float_12s_ease-in-out_infinite]" />
+        <div className="absolute top-1/3 left-1/4 h-56 w-56 rounded-full bg-rose-500/10 blur-3xl animate-[float_14s_ease-in-out_infinite]" />
         <style>{`
-          @keyframes float { 
+          @keyframes float {
             0% { transform: translateY(0px) }
             50% { transform: translateY(-12px) }
             100% { transform: translateY(0px) }
@@ -625,14 +644,14 @@ export default function ContactSection() {
         `}</style>
       </div>
 
-      <div className="container-section relative">
+      <div className="relative w-full max-w-6xl mx-auto">
         {/* Header card */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-20% 0px -10% 0px" }}
           transition={{ duration: 0.4 }}
-          className="mx-auto max-w-4xl mb-8"
+          className="mx-auto mb-8"
         >
           <div className="rounded-3xl border dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-950/60 backdrop-blur p-6 shadow-sm">
             <div className="flex items-start justify-between gap-3">
@@ -719,14 +738,14 @@ export default function ContactSection() {
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[2fr_1fr] gap-6">
+        <div className="grid lg:grid-cols-[1.5fr_1fr] gap-8 xl:gap-12 items-start">
           {/* ====== טופס ====== */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.35 }}
-            className="rounded-3xl border dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-950/60 backdrop-blur p-5 shadow-sm"
+            className="rounded-3xl border dark:border-neutral-800/60 bg-white/75 dark:bg-neutral-950/70 backdrop-blur-xl p-5 shadow-md"
           >
             <form
               className="grid gap-4"
@@ -879,7 +898,7 @@ export default function ContactSection() {
                       />
                       <label className="grid gap-1 text-right">
                         <span className="text-sm opacity-80">עיר/מיקום</span>
-                        <div className="input-base rounded-xl bg-white/70 dark:bg-neutral-950/70 border dark:border-neutral-800/60 input-rtl focus-within:ring-2 ring-rose-500/40 transition flex items-center">
+                        <div className="rounded-xl bg-white/70 dark:bg-neutral-950/70 border dark:border-neutral-800/60 input-rtl focus-within:ring-2 ring-rose-500/40 transition flex items-center">
                           <span className="ps-3 opacity-70">
                             <MapPin className="w-4 h-4" />
                           </span>
@@ -969,7 +988,7 @@ export default function ContactSection() {
                         <button
                           type="button"
                           onClick={openPicker}
-                          className="btn"
+                          className="rounded-xl px-3 py-1.5 text-sm bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:brightness-110"
                         >
                           בחר קבצים
                         </button>
@@ -1179,7 +1198,7 @@ export default function ContactSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.35, delay: 0.05 }}
-            className="rounded-3xl border dark:border-neutral-800/60 bg-white/70 dark:bg-neutral-950/60 backdrop-blur p-5 shadow-sm"
+            className="rounded-3xl border dark:border-neutral-800/60 bg-white/75 dark:bg-neutral-950/70 backdrop-blur-xl p-5 shadow-md"
           >
             <div className="text-right space-y-5">
               <div className="grid grid-cols-1 gap-3">
@@ -1199,7 +1218,7 @@ export default function ContactSection() {
                     </IconLabel>
                     <div className="flex gap-2 justify-end pt-1">
                       <a
-                        className="btn"
+                        className="rounded-xl px-3 py-1.5 text-sm bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:brightness-110"
                         href={waLink}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1207,7 +1226,7 @@ export default function ContactSection() {
                         וואטסאפ
                       </a>
                       <a
-                        className="btn"
+                        className="rounded-xl px-3 py-1.5 text-sm border border-neutral-200/70 dark:border-neutral-700/70 bg-white/80 dark:bg-neutral-950/80 hover:bg-white/95 dark:hover:bg-neutral-900"
                         href={`mailto:${CONTACT?.email || ""}`}
                       >
                         מייל
@@ -1237,36 +1256,24 @@ export default function ContactSection() {
 
               <nav className="pt-1">
                 <div className="font-semibold mb-2">קישורים שימושיים</div>
-                <ul className="text-sm opacity-85 space-y-1">
+                <ul className="text-sm space-y-2">
                   <li>
-                    <a className="underline" href="/videos">
-                      וידאו
-                    </a>
+                    <UsefulLinkButton href="/videos" label="וידאו" />
                   </li>
                   <li>
-                    <a className="underline" href="/gallery">
-                      גלריה
-                    </a>
+                    <UsefulLinkButton href="/gallery" label="גלריה" />
                   </li>
                   <li>
-                    <a className="underline" href="/events">
-                      הזמנת הופעה
-                    </a>
+                    <UsefulLinkButton href="/events" label="הזמנת הופעה" />
                   </li>
                   <li>
-                    <a className="underline" href="/pricing">
-                      מחירים
-                    </a>
+                    <UsefulLinkButton href="/pricing" label="מחירים" />
                   </li>
                   <li>
-                    <a className="underline" href="/club">
-                      MATY-CLUB
-                    </a>
+                    <UsefulLinkButton href="/club" label="MATY-CLUB" />
                   </li>
                   <li>
-                    <a className="underline" href="/date">
-                      MATY-DATE
-                    </a>
+                    <UsefulLinkButton href="/date" label="MATY-DATE" />
                   </li>
                 </ul>
               </nav>
